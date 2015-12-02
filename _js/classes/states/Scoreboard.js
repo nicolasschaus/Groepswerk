@@ -16,9 +16,11 @@ export default class Scoreboard extends Phaser.State {
     this.startButton.anchor.setTo(0.5,0.5);
     this.game.add.tween(this.startButton).to({y:this.game.height - 65}, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
   }
+
   startClick() {
     this.game.state.start('Play');
   }
+  
   backClick() {
     this.game.state.start('Menu');
   }

@@ -21,12 +21,15 @@ export default class Menu extends Phaser.State {
     this.scoreButton.anchor.setTo(0.5,0.5);
     this.game.add.tween(this.scoreButton).to({y:505}, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
   }
+
   update() {
-    //this.zombie.walk;
+    //zombies lopen rond op achtergrond - extraatje
   }
+
   startClick() {
     this.game.state.start('Play');
   }
+
   scoreClick() {
     this.game.state.start('Scoreboard');
   }

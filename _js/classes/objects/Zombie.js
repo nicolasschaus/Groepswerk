@@ -5,6 +5,8 @@ export default class Zombie extends Phaser.Sprite {
 
     this.game.physics.arcade.enableBody(this);
   }
+
   update() {
+  	//beweeg richting player
   }
 }

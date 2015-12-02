@@ -1,7 +1,7 @@
 let cursors;
 let bullets;
-let fireRate;
-let nextFire;
+let fireRate = 100;
+let nextFire = 0;
 
 export default class Soldier extends Phaser.Sprite {
   constructor(game, x, y, frame) {
@@ -10,14 +10,9 @@ export default class Soldier extends Phaser.Sprite {
 
     this.game.physics.arcade.enableBody(this);
 
-    this.bullets = bullets;
-    this.fireRate = 1000;
-    this.nextFire = 0;
-
     cursors = game.input.keyboard.createCursorKeys();
-
-    //this.shootSound = this.game.add.audio('shoot');
   }
+
   create() {
     bullets = game.add.group();
     bullets.enableBody = true;
@@ -26,6 +21,7 @@ export default class Soldier extends Phaser.Sprite {
     bullets.setAll('anchor.x', 0.5);
     bullets.setAll('anchor.y', 0.5);
   }
+
   update() {
     if(cursors.up.isUp || cursors.down.isUp || cursors.left.isUp || cursors.right.isUp) {
       this.body.velocity.setTo(0, 0);
@@ -45,26 +41,9 @@ export default class Soldier extends Phaser.Sprite {
     }
 
     this.rotation = this.game.physics.arcade.angleToPointer(this);
-
-
-/*    if (this.game.input.mousePointer.isDown)
-    {
-        this.game.physics.arcade.moveToPointer(this, 200);
-
-        if (Phaser.Rectangle.contains(this.body, this.game.input.x, this.game.input.y))
-        {
-            this.body.velocity.setTo(0, 0);
-        }
-    }else {
-        this.body.velocity.setTo(0, 0);
-    }*/
   }
+  
   fire() {
     console.log("fire!");
-/*    if (this.game.time.now > this.nextFire) {
-        this.nextFire = this.game.time.now + fireRate;
-        let bullet = this.bullets.getFirstExists(false);
-        this.bullet.rotation = this.game.physics.arcade.moveToPointer(this.bullet, 1000, this.game.input.activePointer, 500);
-    }*/
   }
 }
