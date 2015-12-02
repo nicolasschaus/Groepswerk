@@ -36,15 +36,13 @@ export default class Soldier extends Phaser.Sprite {
       this.body.velocity.y += 75;
     }
     if(cursors.left.isDown) {
-      this.body.velocity.x -= 75;
+      this.body.velocity.x -= 150;
     }else if(cursors.right.isDown) {
-      this.body.velocity.x += 75;
+      this.body.velocity.x += 150;
     }
     if (this.game.input.activePointer.isDown) {
-        fire();
+        this.fire();
     }
-
-    //speedbooster die de velocity aanpast naar 150
 
     this.rotation = this.game.physics.arcade.angleToPointer(this);
 
@@ -62,12 +60,11 @@ export default class Soldier extends Phaser.Sprite {
     }*/
   }
   fire() {
-    if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0)
-    {
+    console.log("fire!");
+/*    if (this.game.time.now > this.nextFire) {
         this.nextFire = this.game.time.now + fireRate;
         let bullet = this.bullets.getFirstExists(false);
         this.bullet.rotation = this.game.physics.arcade.moveToPointer(this.bullet, 1000, this.game.input.activePointer, 500);
-    }
-
-}
+    }*/
+  }
 }
