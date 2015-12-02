@@ -1,2 +1,1 @@
-# Groepswerk
-CP III
+Demo repository
