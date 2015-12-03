@@ -1,7 +1,6 @@
+import Bullet from '../objects/Bullet';
+
 let cursors;
-let bullets;
-let fireRate = 100;
-let nextFire = 0;
 
 export default class Soldier extends Phaser.Sprite {
   constructor(game, x, y, frame) {
@@ -15,14 +14,6 @@ export default class Soldier extends Phaser.Sprite {
 
   create() {
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    bullets = this.game.add.group();
-    bullets.enableBody = true;
-    bullets.physicsBodyType = Phaser.Physics.ARCADE;
-
-    bullets.createMultiple(50, 'bullet');
-/*    this.bullets.setAll('checkWorldBounds', true);
-    this.bullets.setAll('outOfBoundsKill', true);*/
   }
 
   update() {
@@ -48,18 +39,7 @@ export default class Soldier extends Phaser.Sprite {
   }
   
   fire() {
-    console.log("fire!");
-    if (this.game.time.now > this.nextFire) {
-        this.nextFire = this.game.time.now + this.fireRate;
-        let bullet = bullets.getFirstDead();
-        bullet.reset(this.x - 8, this.y - 8);
-        this.game.physics.arcade.moveToPointer(bullet, 300);
-    }
-    console.log(bullets);
-  }
-
-  render() {
-    this.game.debug.text('Active Bullets: ' + bullets.countLiving() + ' / ' + bullets.total, 32, 32);
-    this.game.debug.spriteInfo(this, 32, 450);
+    this.bullet = new Bullet(this.game, this.x, this.y);
+    this.game.add.existing(this.bullet);
   }
 }

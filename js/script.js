@@ -109,6 +109,7 @@
 	    value: function preload() {
 	      this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
 
+	      //alles rond background and menu's
 	      this.load.image('background', 'assets/background.png');
 	      this.load.image('info-pallet', 'assets/info-pallet.png');
 	      this.load.image('title', 'assets/title.png');
@@ -117,11 +118,15 @@
 	      this.load.image('scoreButton', 'assets/score-button.png');
 	      this.load.image('backButton', 'assets/back-button.png');
 
+	      //player en enemies objecten
 	      this.load.image('soldier', 'assets/soldier.png');
 	      this.load.spritesheet('zombie', 'assets/zombie.png', 61, 75, 1);
 
+	      //small objects
+	      this.load.image('heart', 'assets/heart.png');
 	      this.load.image('bullet', 'assets/bullet.png');
 
+	      //font
 	      this.load.bitmapFont('flappyfont', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
 	    }
 	  }, {
@@ -367,6 +372,9 @@
 	      this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	      this.background = this.game.add.sprite(0, 0, 'background');
+
+	      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
+
 	      this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
 
 	      this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
@@ -377,12 +385,19 @@
 	      this.scoreText = this.game.add.bitmapText(this.game.width / 2 + 90, 25, 'flappyfont', this.score.toString(), 24);
 	      this.scoreText.anchor.setTo(0.5, 0.5);
 
-	      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
+	      this.heart = this.game.add.sprite(160, this.game.height - 100, 'heart');
+	      this.heart.anchor.setTo(0.5, 0.5);
+	      this.heart = this.game.add.sprite(160, this.game.height - 78, 'heart');
+	      this.heart.anchor.setTo(0.5, 0.5);
+	      this.heart = this.game.add.sprite(160, this.game.height - 56, 'heart');
+	      this.heart.anchor.setTo(0.5, 0.5);
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      //collision detection
+	      //draai zombie naar player + beweeg hem in die richting
+	      /*    this.rotation = this.game.physics.arcade.angleToPointer(this.zombie);
+	          this.game.physics.arcade.moveToPointer(this.zombie, 50);*/
 	    }
 	  }, {
 	    key: 'spawnZombie',
@@ -403,7 +418,7 @@
 
 /***/ },
 /* 6 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -415,14 +430,17 @@
 
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var _objectsBullet = __webpack_require__(7);
+
+	var _objectsBullet2 = _interopRequireDefault(_objectsBullet);
+
 	var cursors = undefined;
-	var bullets = undefined;
-	var fireRate = 100;
-	var nextFire = 0;
 
 	var Soldier = (function (_Phaser$Sprite) {
 	  _inherits(Soldier, _Phaser$Sprite);
@@ -442,14 +460,6 @@
 	    key: 'create',
 	    value: function create() {
 	      this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-	      bullets = this.game.add.group();
-	      bullets.enableBody = true;
-	      bullets.physicsBodyType = Phaser.Physics.ARCADE;
-
-	      bullets.createMultiple(50, 'bullet');
-	      /*    this.bullets.setAll('checkWorldBounds', true);
-	          this.bullets.setAll('outOfBoundsKill', true);*/
 	    }
 	  }, {
 	    key: 'update',
@@ -477,20 +487,8 @@
 	  }, {
 	    key: 'fire',
 	    value: function fire() {
-	      console.log("fire!");
-	      if (this.game.time.now > this.nextFire) {
-	        this.nextFire = this.game.time.now + this.fireRate;
-	        var bullet = bullets.getFirstDead();
-	        bullet.reset(this.x - 8, this.y - 8);
-	        this.game.physics.arcade.moveToPointer(bullet, 300);
-	      }
-	      console.log(bullets);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      this.game.debug.text('Active Bullets: ' + bullets.countLiving() + ' / ' + bullets.total, 32, 32);
-	      this.game.debug.spriteInfo(this, 32, 450);
+	      this.bullet = new _objectsBullet2['default'](this.game, this.x, this.y);
+	      this.game.add.existing(this.bullet);
 	    }
 	  }]);
 
@@ -498,6 +496,49 @@
 	})(Phaser.Sprite);
 
 	exports['default'] = Soldier;
+	module.exports = exports['default'];
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Bullet = (function (_Phaser$Sprite) {
+	  _inherits(Bullet, _Phaser$Sprite);
+
+	  function Bullet(game, x, y, frame) {
+	    _classCallCheck(this, Bullet);
+
+	    _get(Object.getPrototypeOf(Bullet.prototype), 'constructor', this).call(this, game, x, y, 'bullet', frame);
+	    this.anchor.setTo(0.5, 0.5);
+
+	    this.game.physics.arcade.enableBody(this);
+	  }
+
+	  _createClass(Bullet, [{
+	    key: 'update',
+	    value: function update() {
+	      this.rotation = this.game.physics.arcade.moveToPointer(this, 1000, this.game.input.activePointer, 500);
+	    }
+	  }]);
+
+	  return Bullet;
+	})(Phaser.Sprite);
+
+	exports['default'] = Bullet;
 	module.exports = exports['default'];
 
 /***/ }
