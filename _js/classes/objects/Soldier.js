@@ -1,9 +1,6 @@
 import Bullet from '../objects/Bullet';
 
 let cursors;
-let bullets;
-let fireRate = 100;
-let nextFire = 0;
 
 export default class Soldier extends Phaser.Sprite {
   constructor(game, x, y, frame) {
@@ -13,23 +10,8 @@ export default class Soldier extends Phaser.Sprite {
     game.physics.arcade.enableBody(this);
 
     cursors = game.input.keyboard.createCursorKeys();
-  }
 
-  create() {
-    this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    this.bullet = new Bullet(this.game, this.x, this.y);
-    this.game.add.existing(this.bullet);
-
-    bullets = this.game.add.group();
-    bullets.enableBody = true;
-    bullets.physicsBodyType = Phaser.Physics.ARCADE;
-
-    bullets.createMultiple(50, this.bullet);
-    bullets.setAll('checkWorldBounds', true);
-    bullets.setAll('outOfBoundsKill', true);
-
-    player.body.collideWorldBounds = true;
+    this.body.collideWorldBounds = true;
   }
 
   update() {
@@ -54,29 +36,10 @@ export default class Soldier extends Phaser.Sprite {
 
     this.rotation = this.game.physics.arcade.angleToPointer(this);
 
-    /*this.game.physics.arcade.collide(this, background);*/
-
-    if(this.x >= 1030){
-        this.body.velocity.x = -50;
-    }else if (this.x <= 20){
-        this.body.velocity.x = +50;
-    }else if (this.y <= 20){
-        this.body.velocity.y = +50;
-    }else if (this.y >= 630){
-        this.body.velocity.y = -50;
-    }
-
-
   }
   
   fire() {
-    console.log('shoot');
-/*    if (this.game.time.now > nextFire && bullets.countDead() > 0) {
-        nextFire = this.game.time.now + fireRate;
-        let bullet = bullets.getFirstDead();
-        bullet.reset(this.x - 8, this.y - 8);
-        this.game.physics.arcade.moveToPointer(bullet, 300);
-    }
-    console.log(this.bullet);*/
+    this.bullet = new Bullet(this.game, this.x, this.y);
+    this.game.add.existing(this.bullet);
   }
 }

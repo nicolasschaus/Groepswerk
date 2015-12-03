@@ -436,9 +436,6 @@
 	var _objectsBullet2 = _interopRequireDefault(_objectsBullet);
 
 	var cursors = undefined;
-	var bullets = undefined;
-	var fireRate = 100;
-	var nextFire = 0;
 
 	var Soldier = (function (_Phaser$Sprite) {
 	  _inherits(Soldier, _Phaser$Sprite);
@@ -452,27 +449,11 @@
 	    game.physics.arcade.enableBody(this);
 
 	    cursors = game.input.keyboard.createCursorKeys();
+
+	    this.body.collideWorldBounds = true;
 	  }
 
 	  _createClass(Soldier, [{
-	    key: 'create',
-	    value: function create() {
-	      this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
-	      this.bullet = new _objectsBullet2['default'](this.game, this.x, this.y);
-	      this.game.add.existing(this.bullet);
-
-	      bullets = this.game.add.group();
-	      bullets.enableBody = true;
-	      bullets.physicsBodyType = Phaser.Physics.ARCADE;
-
-	      bullets.createMultiple(50, this.bullet);
-	      bullets.setAll('checkWorldBounds', true);
-	      bullets.setAll('outOfBoundsKill', true);
-
-	      player.body.collideWorldBounds = true;
-	    }
-	  }, {
 	    key: 'update',
 	    value: function update() {
 	      if (cursors.up.isUp || cursors.down.isUp || cursors.left.isUp || cursors.right.isUp) {
@@ -494,30 +475,12 @@
 	      }
 
 	      this.rotation = this.game.physics.arcade.angleToPointer(this);
-
-	      /*this.game.physics.arcade.collide(this, background);*/
-
-	      if (this.x >= 1030) {
-	        this.body.velocity.x = -50;
-	      } else if (this.x <= 20) {
-	        this.body.velocity.x = +50;
-	      } else if (this.y <= 20) {
-	        this.body.velocity.y = +50;
-	      } else if (this.y >= 630) {
-	        this.body.velocity.y = -50;
-	      }
 	    }
 	  }, {
 	    key: 'fire',
 	    value: function fire() {
-	      console.log('shoot');
-	      /*    if (this.game.time.now > nextFire && bullets.countDead() > 0) {
-	              nextFire = this.game.time.now + fireRate;
-	              let bullet = bullets.getFirstDead();
-	              bullet.reset(this.x - 8, this.y - 8);
-	              this.game.physics.arcade.moveToPointer(bullet, 300);
-	          }
-	          console.log(this.bullet);*/
+	      this.bullet = new _objectsBullet2['default'](this.game, this.x, this.y);
+	      this.game.add.existing(this.bullet);
 	    }
 	  }]);
 
@@ -529,7 +492,7 @@
 
 /***/ },
 /* 7 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -541,9 +504,15 @@
 
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _objectsSoldier = __webpack_require__(6);
+
+	var _objectsSoldier2 = _interopRequireDefault(_objectsSoldier);
 
 	var Bullet = (function (_Phaser$Sprite) {
 	  _inherits(Bullet, _Phaser$Sprite);
@@ -554,13 +523,15 @@
 	    _get(Object.getPrototypeOf(Bullet.prototype), 'constructor', this).call(this, game, x, y, 'bullet', frame);
 	    this.anchor.setTo(0.5, 0.5);
 
+	    this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	    this.game.physics.arcade.enableBody(this);
 	  }
 
 	  _createClass(Bullet, [{
 	    key: 'update',
 	    value: function update() {
-	      this.body.velocity.x += 150;
+	      this.rotation = this.game.physics.arcade.angleToPointer(this.soldier);
+	      this.game.physics.arcade.velocityFromRotation(this.rotation, 1000, this.body.velocity);
 	    }
 	  }]);
 
