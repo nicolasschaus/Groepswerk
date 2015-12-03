@@ -364,11 +364,9 @@
 
 	      this.background = this.game.add.sprite(0, 0, 'background');
 
-	      //for(let i = 0; i > 20; i++) {
-	      //group zombies maken
+	      this.zombies = this.game.add.group();
 	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
 	      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
-	      //}
 
 	      this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
 
@@ -388,18 +386,20 @@
 	      this.heart.anchor.setTo(0.5, 0.5);
 	    }
 	  }, {
-	    key: 'update',
-	    value: function update() {
-	      this.rotation = this.game.physics.arcade.angleBetween(this.zombie, this.soldier);
-	      this.game.physics.arcade.moveToObject(this.zombie, this.soldier, 200);
-	    }
-	  }, {
 	    key: 'spawnZombie',
 	    value: function spawnZombie() {
-	      this.game.add.existing(this.zombie);
+	      console.log("spawn");
+	      var zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
+	      this.zombies.add(zombie);
 
 	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
 	      this.zombie.body.collideWorldBounds = true;
+	    }
+	  }, {
+	    key: 'update',
+	    value: function update() {
+	      this.rotation = this.game.physics.arcade.angleBetween(this.zombies, this.soldier);
+	      this.game.physics.arcade.moveToObject(this.zombie, this.soldier, 50); //verhoog speed naarmate game vordert
 	    }
 	  }]);
 
@@ -460,7 +460,7 @@
 	      this.bullet = new _objectsBullet2['default'](this.game, this.x, this.y);
 	      this.game.add.existing(this.bullet);
 
-	      bullets = game.add.group();
+	      bullets = this.game.add.group();
 	      bullets.enableBody = true;
 	      bullets.physicsBodyType = Phaser.Physics.ARCADE;
 
@@ -494,13 +494,14 @@
 	  }, {
 	    key: 'fire',
 	    value: function fire() {
-	      if (this.game.time.now > this.nextFire && bullets.countDead() > 0) {
-	        this.nextFire = this.game.time.now + fireRate;
-	        var bullet = bullets.getFirstDead();
-	        bullet.reset(this.x - 8, this.y - 8);
-	        this.game.physics.arcade.moveToPointer(bullet, 300);
-	      }
-	      console.log(this.bullet);
+	      console.log('shoot');
+	      /*    if (this.game.time.now > nextFire && bullets.countDead() > 0) {
+	              nextFire = this.game.time.now + fireRate;
+	              let bullet = bullets.getFirstDead();
+	              bullet.reset(this.x - 8, this.y - 8);
+	              this.game.physics.arcade.moveToPointer(bullet, 300);
+	          }
+	          console.log(this.bullet);*/
 	    }
 	  }]);
 

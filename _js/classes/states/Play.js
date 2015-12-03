@@ -9,11 +9,9 @@ export default class Play extends Phaser.State {
 
     this.background = this.game.add.sprite(0, 0, 'background');
 
-    //for(let i = 0; i > 20; i++) {
-      //group zombies maken
+    this.zombies = this.game.add.group();
       this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
-      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
-    //}
+    this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
 
     this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
 
@@ -33,16 +31,18 @@ export default class Play extends Phaser.State {
     this.heart.anchor.setTo(0.5,0.5);
 
   }
-  
-  update() {
-    this.rotation = this.game.physics.arcade.angleBetween(this.zombie, this.soldier);
-    this.game.physics.arcade.moveToObject(this.zombie, this.soldier, 200);
-  }
 
   spawnZombie() {
-    this.game.add.existing(this.zombie);
+    console.log("spawn");
+    let zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
+    this.zombies.add(zombie);
 
     this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
     this.zombie.body.collideWorldBounds = true;
+  }  
+
+  update() {
+    this.rotation = this.game.physics.arcade.angleBetween(this.zombies, this.soldier);
+    this.game.physics.arcade.moveToObject(this.zombie, this.soldier, 50); //verhoog speed naarmate game vordert
   }
 }

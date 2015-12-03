@@ -21,7 +21,7 @@ export default class Soldier extends Phaser.Sprite {
     this.bullet = new Bullet(this.game, this.x, this.y);
     this.game.add.existing(this.bullet);
 
-    bullets = game.add.group();
+    bullets = this.game.add.group();
     bullets.enableBody = true;
     bullets.physicsBodyType = Phaser.Physics.ARCADE;
 
@@ -45,20 +45,22 @@ export default class Soldier extends Phaser.Sprite {
       this.body.velocity.x += 150;
     }
 
-    if (this.game.input.activePointer.isDown) {
-      this.fire();
+    if (this.game.input.activePointer.isDown)
+    {
+        this.fire();
     }
 
     this.rotation = this.game.physics.arcade.angleToPointer(this);
   }
   
   fire() {
-    if (this.game.time.now > this.nextFire && bullets.countDead() > 0) {
-        this.nextFire = this.game.time.now + fireRate;
+    console.log('shoot');
+/*    if (this.game.time.now > nextFire && bullets.countDead() > 0) {
+        nextFire = this.game.time.now + fireRate;
         let bullet = bullets.getFirstDead();
         bullet.reset(this.x - 8, this.y - 8);
         this.game.physics.arcade.moveToPointer(bullet, 300);
     }
-    console.log(this.bullet);
+    console.log(this.bullet);*/
   }
 }
