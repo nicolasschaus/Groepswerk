@@ -346,6 +346,8 @@
 
 	var _objectsZombie2 = _interopRequireDefault(_objectsZombie);
 
+	var zombies = undefined;
+
 	var Play = (function (_Phaser$State) {
 	  _inherits(Play, _Phaser$State);
 
@@ -467,6 +469,8 @@
 	      bullets.createMultiple(50, this.bullet);
 	      bullets.setAll('checkWorldBounds', true);
 	      bullets.setAll('outOfBoundsKill', true);
+
+	      player.body.collideWorldBounds = true;
 	    }
 	  }, {
 	    key: 'update',
@@ -490,6 +494,18 @@
 	      }
 
 	      this.rotation = this.game.physics.arcade.angleToPointer(this);
+
+	      /*this.game.physics.arcade.collide(this, background);*/
+
+	      if (this.x >= 1030) {
+	        this.body.velocity.x = -50;
+	      } else if (this.x <= 20) {
+	        this.body.velocity.x = +50;
+	      } else if (this.y <= 20) {
+	        this.body.velocity.y = +50;
+	      } else if (this.y >= 630) {
+	        this.body.velocity.y = -50;
+	      }
 	    }
 	  }, {
 	    key: 'fire',

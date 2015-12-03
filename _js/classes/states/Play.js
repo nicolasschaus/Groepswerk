@@ -1,6 +1,8 @@
 import Soldier from '../objects/Soldier';
 import Zombie from '../objects/Zombie';
 
+let zombies;
+
 export default class Play extends Phaser.State {
   create() {
     this.score = 0;
