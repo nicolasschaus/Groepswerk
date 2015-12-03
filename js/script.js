@@ -230,8 +230,6 @@
 	  value: true
 	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -249,13 +247,6 @@
 
 	    this.game.physics.arcade.enableBody(this);
 	  }
-
-	  _createClass(Zombie, [{
-	    key: 'update',
-	    value: function update() {
-	      //beweeg richting player
-	    }
-	  }]);
 
 	  return Zombie;
 	})(Phaser.Sprite);
@@ -373,7 +364,11 @@
 
 	      this.background = this.game.add.sprite(0, 0, 'background');
 
+	      //for(let i = 0; i > 20; i++) {
+	      //group zombies maken
+	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
 	      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
+	      //}
 
 	      this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
 
@@ -395,14 +390,12 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      //draai zombie naar player + beweeg hem in die richting
-	      /*    this.rotation = this.game.physics.arcade.angleToPointer(this.zombie);
-	          this.game.physics.arcade.moveToPointer(this.zombie, 50);*/
+	      this.rotation = this.game.physics.arcade.angleBetween(this.zombie, this.soldier);
+	      this.game.physics.arcade.moveToObject(this.zombie, this.soldier, 200);
 	    }
 	  }, {
 	    key: 'spawnZombie',
 	    value: function spawnZombie() {
-	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
 	      this.game.add.existing(this.zombie);
 
 	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
@@ -441,6 +434,9 @@
 	var _objectsBullet2 = _interopRequireDefault(_objectsBullet);
 
 	var cursors = undefined;
+	var bullets = undefined;
+	var fireRate = 100;
+	var nextFire = 0;
 
 	var Soldier = (function (_Phaser$Sprite) {
 	  _inherits(Soldier, _Phaser$Sprite);
@@ -460,6 +456,17 @@
 	    key: 'create',
 	    value: function create() {
 	      this.game.physics.startSystem(Phaser.Physics.ARCADE);
+
+	      this.bullet = new _objectsBullet2['default'](this.game, this.x, this.y);
+	      this.game.add.existing(this.bullet);
+
+	      bullets = game.add.group();
+	      bullets.enableBody = true;
+	      bullets.physicsBodyType = Phaser.Physics.ARCADE;
+
+	      bullets.createMultiple(50, this.bullet);
+	      bullets.setAll('checkWorldBounds', true);
+	      bullets.setAll('outOfBoundsKill', true);
 	    }
 	  }, {
 	    key: 'update',
@@ -487,8 +494,13 @@
 	  }, {
 	    key: 'fire',
 	    value: function fire() {
-	      this.bullet = new _objectsBullet2['default'](this.game, this.x, this.y);
-	      this.game.add.existing(this.bullet);
+	      if (this.game.time.now > this.nextFire && bullets.countDead() > 0) {
+	        this.nextFire = this.game.time.now + fireRate;
+	        var bullet = bullets.getFirstDead();
+	        bullet.reset(this.x - 8, this.y - 8);
+	        this.game.physics.arcade.moveToPointer(bullet, 300);
+	      }
+	      console.log(this.bullet);
 	    }
 	  }]);
 
@@ -531,7 +543,7 @@
 	  _createClass(Bullet, [{
 	    key: 'update',
 	    value: function update() {
-	      this.rotation = this.game.physics.arcade.moveToPointer(this, 1000, this.game.input.activePointer, 500);
+	      this.body.velocity.x += 150;
 	    }
 	  }]);
 

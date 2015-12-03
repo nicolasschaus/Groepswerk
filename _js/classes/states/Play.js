@@ -9,7 +9,11 @@ export default class Play extends Phaser.State {
 
     this.background = this.game.add.sprite(0, 0, 'background');
 
-    this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
+    //for(let i = 0; i > 20; i++) {
+      //group zombies maken
+      this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
+      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
+    //}
 
     this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
 
@@ -27,16 +31,15 @@ export default class Play extends Phaser.State {
     this.heart.anchor.setTo(0.5,0.5);
     this.heart = this.game.add.sprite(160, this.game.height - 56, 'heart');
     this.heart.anchor.setTo(0.5,0.5);
+
   }
   
   update() {
-    //draai zombie naar player + beweeg hem in die richting
-/*    this.rotation = this.game.physics.arcade.angleToPointer(this.zombie);
-    this.game.physics.arcade.moveToPointer(this.zombie, 50);*/
+    this.rotation = this.game.physics.arcade.angleBetween(this.zombie, this.soldier);
+    this.game.physics.arcade.moveToObject(this.zombie, this.soldier, 200);
   }
 
   spawnZombie() {
-    this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
     this.game.add.existing(this.zombie);
 
     this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);

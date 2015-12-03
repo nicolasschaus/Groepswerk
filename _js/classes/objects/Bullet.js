@@ -7,6 +7,6 @@ export default class Bullet extends Phaser.Sprite {
   }
 
   update() {
-  	this.rotation = this.game.physics.arcade.moveToPointer(this, 1000, this.game.input.activePointer, 500);
+  	this.body.velocity.x += 150;
   }
 }
