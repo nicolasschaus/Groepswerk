@@ -119,18 +119,11 @@
 
 	      this.load.image('soldier', 'assets/soldier.png');
 	      this.load.spritesheet('zombie', 'assets/zombie.png', 61, 75, 1);
+
 	      this.load.image('bullet', 'assets/bullet.png');
 
 	      this.load.bitmapFont('flappyfont', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
-
-	      //this.load.audio('flap', 'assets/flap.wav');
 	    }
-	  }, {
-	    key: 'create',
-	    value: function create() {}
-	  }, {
-	    key: 'update',
-	    value: function update() {}
 	  }, {
 	    key: 'onLoadComplete',
 	    value: function onLoadComplete() {
@@ -202,7 +195,7 @@
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      //this.zombie.walk;
+	      //zombies lopen rond op achtergrond - extraatje
 	    }
 	  }, {
 	    key: 'startClick',
@@ -254,7 +247,9 @@
 
 	  _createClass(Zombie, [{
 	    key: 'update',
-	    value: function update() {}
+	    value: function update() {
+	      //beweeg richting player
+	    }
 	  }]);
 
 	  return Zombie;
@@ -377,33 +372,26 @@
 	      this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	      this.game.add.existing(this.soldier);
 
-	      this.zombie = new _objectsZombie2['default'](this.game, 100, 100);
-	      this.game.add.existing(this.zombie);
-
-	      this.wavesText = this.game.add.bitmapText(this.game.width / 2 - 40, 25, 'flappyfont', "zombies slaugthered x", 16);
+	      this.wavesText = this.game.add.bitmapText(this.game.width / 2 - 40, 25, 'flappyfont', "ZOMBIES SLAUGHTERED x", 16);
 	      this.wavesText.anchor.setTo(0.5, 0.5);
 	      this.scoreText = this.game.add.bitmapText(this.game.width / 2 + 90, 25, 'flappyfont', this.score.toString(), 24);
 	      this.scoreText.anchor.setTo(0.5, 0.5);
+
+	      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
-	      //this.game.physics.arcade.collide(this.bird, this.ground, this.groundHitHandler, null, this); - collision with zombies
+	      //collision detection
 	    }
 	  }, {
-	    key: 'zombieHitHandler',
-	    value: function zombieHitHandler() {
-	      this.deathSound.play();
-	      this.deathHandler();
-	    }
-	  }, {
-	    key: 'deathHandler',
-	    value: function deathHandler() {
-	      this.soldier.kill();
+	    key: 'spawnZombie',
+	    value: function spawnZombie() {
+	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
+	      this.game.add.existing(this.zombie);
 
-	      /*  this.scoreboard = new Scoreboard(this.game);
-	          this.game.add.existing(this.scoreboard); - komt nog
-	          this.scoreboard.show(this.score);*/
+	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
+	      this.zombie.body.collideWorldBounds = true;
 	    }
 	  }]);
 
@@ -433,8 +421,8 @@
 
 	var cursors = undefined;
 	var bullets = undefined;
-	var fireRate = undefined;
-	var nextFire = undefined;
+	var fireRate = 100;
+	var nextFire = 0;
 
 	var Soldier = (function (_Phaser$Sprite) {
 	  _inherits(Soldier, _Phaser$Sprite);
@@ -445,26 +433,23 @@
 	    _get(Object.getPrototypeOf(Soldier.prototype), 'constructor', this).call(this, game, x, y, 'soldier', frame);
 	    this.anchor.setTo(0.5, 0.5);
 
-	    this.game.physics.arcade.enableBody(this);
-
-	    this.bullets = bullets;
-	    this.fireRate = 1000;
-	    this.nextFire = 0;
+	    game.physics.arcade.enableBody(this);
 
 	    cursors = game.input.keyboard.createCursorKeys();
-
-	    //this.shootSound = this.game.add.audio('shoot');
 	  }
 
 	  _createClass(Soldier, [{
 	    key: 'create',
 	    value: function create() {
-	      bullets = game.add.group();
+	      this.game.physics.startSystem(Phaser.Physics.ARCADE);
+
+	      bullets = this.game.add.group();
 	      bullets.enableBody = true;
 	      bullets.physicsBodyType = Phaser.Physics.ARCADE;
-	      bullets.createMultiple(30, 'bullet', 0, false);
-	      bullets.setAll('anchor.x', 0.5);
-	      bullets.setAll('anchor.y', 0.5);
+
+	      bullets.createMultiple(50, 'bullet');
+	      /*    this.bullets.setAll('checkWorldBounds', true);
+	          this.bullets.setAll('outOfBoundsKill', true);*/
 	    }
 	  }, {
 	    key: 'update',
@@ -473,42 +458,39 @@
 	        this.body.velocity.setTo(0, 0);
 	      }
 	      if (cursors.up.isDown) {
-	        this.body.velocity.y -= 75;
+	        this.body.velocity.y -= 150;
 	      } else if (cursors.down.isDown) {
-	        this.body.velocity.y += 75;
+	        this.body.velocity.y += 150;
 	      }
 	      if (cursors.left.isDown) {
 	        this.body.velocity.x -= 150;
 	      } else if (cursors.right.isDown) {
 	        this.body.velocity.x += 150;
 	      }
+
 	      if (this.game.input.activePointer.isDown) {
 	        this.fire();
 	      }
 
 	      this.rotation = this.game.physics.arcade.angleToPointer(this);
-
-	      /*    if (this.game.input.mousePointer.isDown)
-	          {
-	              this.game.physics.arcade.moveToPointer(this, 200);
-	      
-	              if (Phaser.Rectangle.contains(this.body, this.game.input.x, this.game.input.y))
-	              {
-	                  this.body.velocity.setTo(0, 0);
-	              }
-	          }else {
-	              this.body.velocity.setTo(0, 0);
-	          }*/
 	    }
 	  }, {
 	    key: 'fire',
 	    value: function fire() {
 	      console.log("fire!");
-	      /*    if (this.game.time.now > this.nextFire) {
-	              this.nextFire = this.game.time.now + fireRate;
-	              let bullet = this.bullets.getFirstExists(false);
-	              this.bullet.rotation = this.game.physics.arcade.moveToPointer(this.bullet, 1000, this.game.input.activePointer, 500);
-	          }*/
+	      if (this.game.time.now > this.nextFire) {
+	        this.nextFire = this.game.time.now + this.fireRate;
+	        var bullet = bullets.getFirstDead();
+	        bullet.reset(this.x - 8, this.y - 8);
+	        this.game.physics.arcade.moveToPointer(bullet, 300);
+	      }
+	      console.log(bullets);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      this.game.debug.text('Active Bullets: ' + bullets.countLiving() + ' / ' + bullets.total, 32, 32);
+	      this.game.debug.spriteInfo(this, 32, 450);
 	    }
 	  }]);
 
