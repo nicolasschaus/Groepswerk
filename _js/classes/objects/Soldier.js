@@ -28,6 +28,8 @@ export default class Soldier extends Phaser.Sprite {
     bullets.createMultiple(50, this.bullet);
     bullets.setAll('checkWorldBounds', true);
     bullets.setAll('outOfBoundsKill', true);
+
+    player.body.collideWorldBounds = true;
   }
 
   update() {
@@ -51,6 +53,20 @@ export default class Soldier extends Phaser.Sprite {
     }
 
     this.rotation = this.game.physics.arcade.angleToPointer(this);
+
+    /*this.game.physics.arcade.collide(this, background);*/
+
+    if(this.x >= 1030){
+        this.body.velocity.x = -50;
+    }else if (this.x <= 20){
+        this.body.velocity.x = +50;
+    }else if (this.y <= 20){
+        this.body.velocity.y = +50;
+    }else if (this.y >= 630){
+        this.body.velocity.y = -50;
+    }
+
+
   }
   
   fire() {
