@@ -16,14 +16,13 @@ export default class Preload extends Phaser.State {
     this.load.spritesheet('zombie', 'assets/zombie.png', 61, 75, 1);
 
     //small objects
-    this.load.image('heart', 'assets/heart.png');
     this.load.image('bullet', 'assets/bullet.png');
 
     //font
-    this.load.bitmapFont('flappyfont', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
+    this.load.bitmapFont('gamefont', 'assets/fonts/gamefont/gamefont.png', 'assets/fonts/gamefont/gamefont.fnt');
   }
 
   onLoadComplete() {
-    this.game.state.start('Play');
+    this.game.state.start('Menu');
   }
 }
