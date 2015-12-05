@@ -42,9 +42,6 @@ export default class Play extends Phaser.State {
   } 
 
   update() {
-/*    this.rotation = this.game.physics.arcade.angleBetween(this.zombies, this.soldier);
-    this.game.physics.arcade.moveToObject(this.zombie, this.soldier, 50); //verhoog speed naarmate game vordert*/
-
     this.soldier.rotation = this.game.physics.arcade.angleToPointer(this.soldier);
 
     if (this.game.input.activePointer.isDown)
@@ -54,7 +51,6 @@ export default class Play extends Phaser.State {
   }
 
   fire () {
-    console.log('fire!');
     if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0)
     {
         this.nextFire = this.game.time.now + this.fireRate;
@@ -73,8 +69,8 @@ export default class Play extends Phaser.State {
     let randomX = Math.random(0)*1050;
     let randomY = Math.random(0)*650;
 
-    let xPos = (randomX - 1050) - this.zombie.width;
-    let yPos = (randomY - 650) - this.zombie.height;
+    let xPos = (randomX + 1050) - this.zombie.width;
+    let yPos = (randomY + 650) - this.zombie.height;
 
     let zombie = new Zombie(this.game, xPos, yPos);
     this.zombies.add(zombie);
