@@ -4,6 +4,7 @@ export default class Preload extends Phaser.State {
 
     //alles rond background and menu's
     this.load.image('background', 'assets/background.png');
+    this.load.image('backgroundMenu', 'assets/backgroundMenu.png');
     this.load.image('title', 'assets/title.png');
     this.load.image('title-mini', 'assets/title-mini.png');
     this.load.image('startButton', 'assets/start-button.png');
