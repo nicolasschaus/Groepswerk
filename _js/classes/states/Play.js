@@ -15,7 +15,7 @@ export default class Play extends Phaser.State {
       this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
     this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
 
-    this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
+    //this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
 
     this.soldier = new Soldier(this.game, this.game.width/2, this.game.height/2);
     this.game.add.existing(this.soldier);
@@ -27,12 +27,19 @@ export default class Play extends Phaser.State {
   }
 
   spawnZombie() {
-    console.log("spawn");
-    let zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
+    console.log("spawned at");
+    let randomX = Math.random(0)*1050;
+    let randomY = Math.random(0)*650;
+
+    let xPos = (randomX - 1050) - this.zombie.width;
+    let yPos = (randomY - 650) - this.zombie.height;
+
+    let zombie = new Zombie(this.game, xPos, yPos);
     this.zombies.add(zombie);
 
+    console.log(xPos + ", " + yPos);
+
     this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
-    this.zombie.body.collideWorldBounds = true;
   }  
 
   update() {

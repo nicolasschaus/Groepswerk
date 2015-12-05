@@ -111,7 +111,6 @@
 
 	      //alles rond background and menu's
 	      this.load.image('background', 'assets/background.png');
-	      this.load.image('info-pallet', 'assets/info-pallet.png');
 	      this.load.image('title', 'assets/title.png');
 	      this.load.image('title-mini', 'assets/title-mini.png');
 	      this.load.image('startButton', 'assets/start-button.png');
@@ -121,6 +120,7 @@
 	      //player en enemies objecten
 	      this.load.image('soldier', 'assets/soldier.png');
 	      this.load.spritesheet('zombie', 'assets/zombie.png', 61, 75, 1);
+	      this.load.spritesheet('zombieSpecial', 'assets/zombieSpecial.png', 61, 75, 1);
 
 	      //small objects
 	      this.load.image('bullet', 'assets/bullet.png');
@@ -131,7 +131,7 @@
 	  }, {
 	    key: 'onLoadComplete',
 	    value: function onLoadComplete() {
-	      this.game.state.start('Menu');
+	      this.game.state.start('Play');
 	    }
 	  }]);
 
@@ -221,7 +221,7 @@
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -229,11 +229,19 @@
 	  value: true
 	});
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _objectsSoldier = __webpack_require__(6);
+
+	var _objectsSoldier2 = _interopRequireDefault(_objectsSoldier);
 
 	var Zombie = (function (_Phaser$Sprite) {
 	  _inherits(Zombie, _Phaser$Sprite);
@@ -245,7 +253,16 @@
 	    this.anchor.setTo(0.5, 0.5);
 
 	    this.game.physics.arcade.enableBody(this);
+
+	    this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	  }
+
+	  _createClass(Zombie, [{
+	    key: 'update',
+	    value: function update() {
+	      this.game.physics.arcade.velocityFromRotation(this.soldier, 50, this.body.velocity);
+	    }
+	  }]);
 
 	  return Zombie;
 	})(Phaser.Sprite);
@@ -369,7 +386,7 @@
 	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
 	      this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 20, this.spawnZombie, this);
 
-	      this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
+	      //this.wooden = this.game.add.sprite(0, this.game.height - 148, 'info-pallet');
 
 	      this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	      this.game.add.existing(this.soldier);
@@ -382,12 +399,19 @@
 	  }, {
 	    key: 'spawnZombie',
 	    value: function spawnZombie() {
-	      console.log("spawn");
-	      var zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
+	      console.log("spawned at");
+	      var randomX = Math.random(0) * 1050;
+	      var randomY = Math.random(0) * 650;
+
+	      var xPos = randomX - 1050 - this.zombie.width;
+	      var yPos = randomY - 650 - this.zombie.height;
+
+	      var zombie = new _objectsZombie2['default'](this.game, xPos, yPos);
 	      this.zombies.add(zombie);
 
+	      console.log(xPos + ", " + yPos);
+
 	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
-	      this.zombie.body.collideWorldBounds = true;
 	    }
 	  }, {
 	    key: 'update',
@@ -427,8 +451,6 @@
 
 	var _objectsBullet2 = _interopRequireDefault(_objectsBullet);
 
-	var cursors = undefined;
-
 	var Soldier = (function (_Phaser$Sprite) {
 	  _inherits(Soldier, _Phaser$Sprite);
 
@@ -439,29 +461,11 @@
 	    this.anchor.setTo(0.5, 0.5);
 
 	    game.physics.arcade.enableBody(this);
-
-	    cursors = game.input.keyboard.createCursorKeys();
-
-	    this.body.collideWorldBounds = true;
 	  }
 
 	  _createClass(Soldier, [{
 	    key: 'update',
 	    value: function update() {
-	      if (cursors.up.isUp || cursors.down.isUp || cursors.left.isUp || cursors.right.isUp) {
-	        this.body.velocity.setTo(0, 0);
-	      }
-	      if (cursors.up.isDown) {
-	        this.body.velocity.y -= 150;
-	      } else if (cursors.down.isDown) {
-	        this.body.velocity.y += 150;
-	      }
-	      if (cursors.left.isDown) {
-	        this.body.velocity.x -= 150;
-	      } else if (cursors.right.isDown) {
-	        this.body.velocity.x += 150;
-	      }
-
 	      if (this.game.input.activePointer.isDown) {
 	        this.fire();
 	      }
@@ -471,8 +475,9 @@
 	  }, {
 	    key: 'fire',
 	    value: function fire() {
-	      this.bullet = new _objectsBullet2['default'](this.game, this.x, this.y);
-	      this.game.add.existing(this.bullet);
+	      console.log("fire!");
+	      /*this.bullet = new Bullet(this.game, this.x, this.y);
+	      this.game.add.existing(this.bullet);*/
 	    }
 	  }]);
 
