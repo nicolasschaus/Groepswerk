@@ -112,7 +112,24 @@ export default class Play extends Phaser.State {
     soldier.kill();
     zombie.kill();
 
-    this.game.state.start('End');
+
+    if(this.soldier.kill()) {
+      //zombies stoppen met lopen wanneer speler dood is
+      this.game.world.removeAll();
+      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+
+      //score weergeven
+/*      this.scoreTitle = this.game.add.bitmapText(this.game.width/2, this.game.height/2 - 50, 'gamefont', "CONGRATULATIONS !", 48);
+      this.scoreTitle.anchor.setTo(0.5, 0.5);
+      this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont',"YOU SLAUGHTERED " + this.score.toString() + " ZOMBIES !", 24);
+      this.scoreText.anchor.setTo(0.5, 0.5);*/
+    }
+
+    this.game.time.events.loop(Phaser.Timer.SECOND * 10, this.endIt, this);
   }
 
+  endIt() {
+    console.log("done!");
+    this.game.state.start('End');
+  }
 }

@@ -56,15 +56,15 @@
 
 	var _classesStatesMenu2 = _interopRequireDefault(_classesStatesMenu);
 
-	var _classesStatesPlay = __webpack_require__(4);
+	var _classesStatesPlay = __webpack_require__(3);
 
 	var _classesStatesPlay2 = _interopRequireDefault(_classesStatesPlay);
 
-	var _classesStatesEnd = __webpack_require__(9);
+	var _classesStatesEnd = __webpack_require__(7);
 
 	var _classesStatesEnd2 = _interopRequireDefault(_classesStatesEnd);
 
-	var _classesStatesScoreboard = __webpack_require__(3);
+	var _classesStatesScoreboard = __webpack_require__(8);
 
 	var _classesStatesScoreboard2 = _interopRequireDefault(_classesStatesScoreboard);
 
@@ -213,70 +213,6 @@
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Scoreboard = (function (_Phaser$State) {
-	  _inherits(Scoreboard, _Phaser$State);
-
-	  function Scoreboard() {
-	    _classCallCheck(this, Scoreboard);
-
-	    _get(Object.getPrototypeOf(Scoreboard.prototype), 'constructor', this).apply(this, arguments);
-	  }
-
-	  _createClass(Scoreboard, [{
-	    key: 'create',
-	    value: function create() {
-	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
-
-	      this.titleGroup = this.game.add.group();
-	      this.title = this.game.add.image(this.game.width / 2, 0, 'title-mini');
-	      this.title.anchor.setTo(0.5, 0.5);
-	      this.titleGroup.add(this.title);
-	      this.titleGroup.y = 100;
-
-	      this.backButton = this.game.add.button(100, this.game.height - 70, 'backButton', this.backClick, this);
-	      this.backButton.anchor.setTo(0.5, 0.5);
-	      this.game.add.tween(this.backButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
-
-	      this.startButton = this.game.add.button(this.game.width - 100, this.game.height - 70, 'startButton', this.startClick, this);
-	      this.startButton.anchor.setTo(0.5, 0.5);
-	      this.game.add.tween(this.startButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
-	    }
-	  }, {
-	    key: 'startClick',
-	    value: function startClick() {
-	      this.game.state.start('Play');
-	    }
-	  }, {
-	    key: 'backClick',
-	    value: function backClick() {
-	      this.game.state.start('Menu');
-	    }
-	  }]);
-
-	  return Scoreboard;
-	})(Phaser.State);
-
-	exports['default'] = Scoreboard;
-	module.exports = exports['default'];
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -295,15 +231,15 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var _objectsSoldier = __webpack_require__(5);
+	var _objectsSoldier = __webpack_require__(4);
 
 	var _objectsSoldier2 = _interopRequireDefault(_objectsSoldier);
 
-	var _objectsZombie = __webpack_require__(6);
+	var _objectsZombie = __webpack_require__(5);
 
 	var _objectsZombie2 = _interopRequireDefault(_objectsZombie);
 
-	var _objectsSpecialZombie = __webpack_require__(7);
+	var _objectsSpecialZombie = __webpack_require__(6);
 
 	var _objectsSpecialZombie2 = _interopRequireDefault(_objectsSpecialZombie);
 
@@ -433,6 +369,24 @@
 	      soldier.kill();
 	      zombie.kill();
 
+	      if (this.soldier.kill()) {
+	        //zombies stoppen met lopen wanneer speler dood is
+	        this.game.world.removeAll();
+	        this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+
+	        //score weergeven
+	        /*      this.scoreTitle = this.game.add.bitmapText(this.game.width/2, this.game.height/2 - 50, 'gamefont', "CONGRATULATIONS !", 48);
+	              this.scoreTitle.anchor.setTo(0.5, 0.5);
+	              this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont',"YOU SLAUGHTERED " + this.score.toString() + " ZOMBIES !", 24);
+	              this.scoreText.anchor.setTo(0.5, 0.5);*/
+	      }
+
+	      this.game.time.events.loop(Phaser.Timer.SECOND * 10, this.endIt, this);
+	    }
+	  }, {
+	    key: 'endIt',
+	    value: function endIt() {
+	      console.log("done!");
 	      this.game.state.start('End');
 	    }
 	  }]);
@@ -444,7 +398,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -477,7 +431,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -496,7 +450,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var _objectsSoldier = __webpack_require__(5);
+	var _objectsSoldier = __webpack_require__(4);
 
 	var _objectsSoldier2 = _interopRequireDefault(_objectsSoldier);
 
@@ -517,7 +471,7 @@
 	    key: 'update',
 	    value: function update() {
 	      this.rotation = this.game.physics.arcade.angleBetween(this, this.soldier);
-	      this.game.physics.arcade.moveToObject(this, this.soldier, 75);
+	      this.game.physics.arcade.moveToObject(this, this.soldier, 400);
 	    }
 	  }]);
 
@@ -528,7 +482,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -547,7 +501,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var _objectsSoldier = __webpack_require__(5);
+	var _objectsSoldier = __webpack_require__(4);
 
 	var _objectsSoldier2 = _interopRequireDefault(_objectsSoldier);
 
@@ -568,7 +522,7 @@
 	    key: 'update',
 	    value: function update() {
 	      this.rotation = this.game.physics.arcade.angleBetween(this, this.soldier);
-	      this.game.physics.arcade.moveToObject(this, this.soldier, 90);
+	      this.game.physics.arcade.moveToObject(this, this.soldier, 111);
 	    }
 	  }]);
 
@@ -579,8 +533,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 8 */,
-/* 9 */
+/* 7 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -641,6 +594,70 @@
 	})(Phaser.State);
 
 	exports['default'] = End;
+	module.exports = exports['default'];
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Scoreboard = (function (_Phaser$State) {
+	  _inherits(Scoreboard, _Phaser$State);
+
+	  function Scoreboard() {
+	    _classCallCheck(this, Scoreboard);
+
+	    _get(Object.getPrototypeOf(Scoreboard.prototype), 'constructor', this).apply(this, arguments);
+	  }
+
+	  _createClass(Scoreboard, [{
+	    key: 'create',
+	    value: function create() {
+	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+
+	      this.titleGroup = this.game.add.group();
+	      this.title = this.game.add.image(this.game.width / 2, 0, 'title-mini');
+	      this.title.anchor.setTo(0.5, 0.5);
+	      this.titleGroup.add(this.title);
+	      this.titleGroup.y = 100;
+
+	      this.backButton = this.game.add.button(100, this.game.height - 70, 'backButton', this.backClick, this);
+	      this.backButton.anchor.setTo(0.5, 0.5);
+	      this.game.add.tween(this.backButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+
+	      this.startButton = this.game.add.button(this.game.width - 100, this.game.height - 70, 'startButton', this.startClick, this);
+	      this.startButton.anchor.setTo(0.5, 0.5);
+	      this.game.add.tween(this.startButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+	    }
+	  }, {
+	    key: 'startClick',
+	    value: function startClick() {
+	      this.game.state.start('Play');
+	    }
+	  }, {
+	    key: 'backClick',
+	    value: function backClick() {
+	      this.game.state.start('Menu');
+	    }
+	  }]);
+
+	  return Scoreboard;
+	})(Phaser.State);
+
+	exports['default'] = Scoreboard;
 	module.exports = exports['default'];
 
 /***/ }
