@@ -328,9 +328,8 @@
 	      //bullets
 	      this.bullets = this.game.add.group();
 	      this.bullets.enableBody = true;
-	      this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
-
 	      this.bullets.createMultiple(50, 'bullet');
+	      this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
 	      this.bullets.setAll('checkWorldBounds', true);
 	      this.bullets.setAll('outOfBoundsKill', true);
 
@@ -347,7 +346,7 @@
 	      //tekst plaatsen
 	      this.wavesText = this.game.add.bitmapText(this.game.width / 2 - 40, 25, 'gamefont', "ZOMBIES SLAUGHTERED x", 16);
 	      this.wavesText.anchor.setTo(0.5, 0.5);
-	      this.scoreText = this.game.add.bitmapText(this.game.width / 2 + 90, 25, 'gamefont', this.score.toString(), 24);
+	      this.scoreText = this.game.add.bitmapText(this.game.width / 2 + 100, 25, 'gamefont', this.score.toString(), 24);
 	      this.scoreText.anchor.setTo(0.5, 0.5);
 	    }
 	  }, {
@@ -358,17 +357,16 @@
 	      if (this.game.input.activePointer.isDown) {
 	        this.fire();
 	      }
+	      //collision detection
+	      this.game.physics.arcade.overlap(this.bullets, this.zombies, this.collisionHandler, null, this);
 	    }
 	  }, {
 	    key: 'fire',
 	    value: function fire() {
 	      if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0) {
 	        this.nextFire = this.game.time.now + this.fireRate;
-
 	        var bullet = this.bullets.getFirstDead();
-
 	        bullet.reset(this.soldier.x - 8, this.soldier.y - 8);
-
 	        this.game.physics.arcade.moveToPointer(bullet, 300);
 	      }
 	    }
@@ -377,7 +375,7 @@
 	  }, {
 	    key: 'spawnZombie',
 	    value: function spawnZombie() {
-	      console.log("spawned at");
+	      //console.log("spawned at");
 	      var randomX = Math.random(0) * 1050;
 	      var randomY = Math.random(0) * 650;
 
@@ -387,7 +385,7 @@
 	      var zombie = new _objectsZombie2['default'](this.game, xPos, yPos);
 	      this.zombies.add(zombie);
 
-	      console.log(xPos + ", " + yPos);
+	      //console.log(xPos + ", " + yPos);
 
 	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
 	    }
@@ -408,6 +406,18 @@
 	    
 	        this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
 	      }*/
+
+	  }, {
+	    key: 'collisionHandler',
+	    value: function collisionHandler(bullet, zombie) {
+	      //wanneer een zombie sterft wordt ook de kogel vernietigt
+	      bullet.kill();
+	      zombie.destroy();
+
+	      //score gaat omhoog
+	      /*    this.score += 1;
+	          this.scoreText.text = this.score.toString() + this.score;*/
+	    }
 	  }]);
 
 	  return Play;
