@@ -4,8 +4,4 @@ export default class Soldier extends Phaser.Sprite {
     this.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enableBody(this);
   }
-
-  update() {
-    this.rotation = this.game.physics.arcade.angleToPointer(this);
-  }
 }

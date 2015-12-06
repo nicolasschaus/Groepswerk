@@ -337,17 +337,15 @@
 	      this.zombies = this.game.add.group();
 	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
 	      this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
-	      //this.game.time.events.loop(Phaser.Timer.SECOND * 20, this.spawnSpecialZombie, this);
+	      this.game.time.events.loop(Phaser.Timer.SECOND * 20, this.spawnSpecialZombie, this);
 
 	      //player weergeven
 	      this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	      this.game.add.existing(this.soldier);
 
-	      //tekst plaatsen
-	      this.wavesText = this.game.add.bitmapText(this.game.width / 2 - 40, 25, 'gamefont', "ZOMBIES SLAUGHTERED x", 16);
-	      this.wavesText.anchor.setTo(0.5, 0.5);
-	      this.scoreText = this.game.add.bitmapText(this.game.width / 2 + 100, 25, 'gamefont', this.score.toString(), 24);
-	      this.scoreText.anchor.setTo(0.5, 0.5);
+	      //score weergeven
+	      this.scoreTekstje = this.game.add.bitmapText(this.game.width / 2 - 100, 25, 'gamefont', "ZOMBIES SLAUGHTERED x", 16);
+	      this.scoreText = this.game.add.bitmapText(this.game.width / 2 + 100, 20, 'gamefont', this.score.toString(), 24);
 	    }
 	  }, {
 	    key: 'update',
@@ -355,8 +353,12 @@
 	      this.soldier.rotation = this.game.physics.arcade.angleToPointer(this.soldier);
 
 	      if (this.game.input.activePointer.isDown) {
-	        this.fire();
+	        //als je 5 seconden lang schiet, raakt je wapen oververhit
+	        if (this.game.input.activePointer.duration <= 5000) {
+	          this.fire();
+	        }
 	      }
+
 	      //collision detection
 	      this.game.physics.arcade.overlap(this.bullets, this.zombies, this.collisionHandler, null, this);
 	    }
@@ -391,22 +393,23 @@
 	    }
 
 	    //speciale zombies spawnen
-	    /*  spawnSpecialZombie() {
-	        console.log("spawned special at");
-	        let randomX = Math.random(0)*1050;
-	        let randomY = Math.random(0)*650;
-	    
-	        let xPos = (randomX - 1050) - this.zombie.width;
-	        let yPos = (randomY - 650) - this.zombie.height;
-	    
-	        let zombie = new SpecialZombie(this.game, xPos, yPos);
-	        this.zombies.add(zombie);
-	    
-	        console.log(xPos + ", " + yPos);
-	    
-	        this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
-	      }*/
+	  }, {
+	    key: 'spawnSpecialZombie',
+	    value: function spawnSpecialZombie() {
+	      //console.log("spawned special at");
+	      var randomX = Math.random(0) * 1050;
+	      var randomY = Math.random(0) * 650;
 
+	      var xPos = randomX - 1050 - this.zombie.width;
+	      var yPos = randomY - 650 - this.zombie.height;
+
+	      var zombie = new _objectsSpecialZombie2['default'](this.game, xPos, yPos);
+	      this.zombies.add(zombie);
+
+	      //console.log(xPos + ", " + yPos);
+
+	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
+	    }
 	  }, {
 	    key: 'collisionHandler',
 	    value: function collisionHandler(bullet, zombie) {
@@ -415,8 +418,8 @@
 	      zombie.destroy();
 
 	      //score gaat omhoog
-	      /*    this.score += 1;
-	          this.scoreText.text = this.score.toString() + this.score;*/
+	      this.score++;
+	      this.scoreText.text = this.score.toString();
 	    }
 	  }]);
 
@@ -436,8 +439,6 @@
 	  value: true
 	});
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -454,13 +455,6 @@
 	    this.anchor.setTo(0.5, 0.5);
 	    game.physics.arcade.enableBody(this);
 	  }
-
-	  _createClass(Soldier, [{
-	    key: 'update',
-	    value: function update() {
-	      this.rotation = this.game.physics.arcade.angleToPointer(this);
-	    }
-	  }]);
 
 	  return Soldier;
 	})(Phaser.Sprite);
@@ -559,7 +553,8 @@
 	  _createClass(Zombie, [{
 	    key: 'update',
 	    value: function update() {
-	      this.game.physics.arcade.moveToObject(this, this.soldier, 75);
+	      this.rotation = this.game.physics.arcade.angleBetween(this, this.soldier);
+	      this.game.physics.arcade.moveToObject(this, this.soldier, 90);
 	    }
 	  }]);
 

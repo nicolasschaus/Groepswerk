@@ -10,6 +10,7 @@ export default class Zombie extends Phaser.Sprite {
   }
 
   update() {
-    this.game.physics.arcade.moveToObject(this, this.soldier, 75);
+    this.rotation = this.game.physics.arcade.angleBetween(this, this.soldier);
+    this.game.physics.arcade.moveToObject(this, this.soldier, 90);
   }
 }

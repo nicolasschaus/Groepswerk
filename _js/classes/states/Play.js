@@ -27,25 +27,28 @@ export default class Play extends Phaser.State {
     this.zombies = this.game.add.group();
       this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
     this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
-    //this.game.time.events.loop(Phaser.Timer.SECOND * 20, this.spawnSpecialZombie, this);
+    this.game.time.events.loop(Phaser.Timer.SECOND * 20, this.spawnSpecialZombie, this);
 
     //player weergeven
     this.soldier = new Soldier(this.game, this.game.width/2, this.game.height/2);
     this.game.add.existing(this.soldier);
 
-    //tekst plaatsen
-    this.wavesText = this.game.add.bitmapText(this.game.width/2 - 40, 25, 'gamefont',"ZOMBIES SLAUGHTERED x", 16);
-    this.wavesText.anchor.setTo(0.5,0.5);
-    this.scoreText = this.game.add.bitmapText(this.game.width/2 + 100, 25, 'gamefont',this.score.toString(), 24);
-    this.scoreText.anchor.setTo(0.5,0.5);
+    //score weergeven
+    this.scoreTekstje = this.game.add.bitmapText(this.game.width/2 - 100, 25, 'gamefont',"ZOMBIES SLAUGHTERED x", 16);
+    this.scoreText = this.game.add.bitmapText(this.game.width/2 + 100, 20, 'gamefont',this.score.toString(), 24);
   } 
 
   update() {
     this.soldier.rotation = this.game.physics.arcade.angleToPointer(this.soldier);
 
-    if (this.game.input.activePointer.isDown) {
+    if (this.game.input.activePointer.isDown)
+    {
+      //als je 5 seconden lang schiet, raakt je wapen oververhit
+      if(this.game.input.activePointer.duration <= 5000) {
         this.fire();
+      }
     }
+
     //collision detection
     this.game.physics.arcade.overlap(this.bullets, this.zombies, this.collisionHandler, null, this);
   }
@@ -78,8 +81,8 @@ export default class Play extends Phaser.State {
   }
 
   //speciale zombies spawnen
-/*  spawnSpecialZombie() {
-    console.log("spawned special at");
+  spawnSpecialZombie() {
+    //console.log("spawned special at");
     let randomX = Math.random(0)*1050;
     let randomY = Math.random(0)*650;
 
@@ -89,10 +92,10 @@ export default class Play extends Phaser.State {
     let zombie = new SpecialZombie(this.game, xPos, yPos);
     this.zombies.add(zombie);
 
-    console.log(xPos + ", " + yPos);
+    //console.log(xPos + ", " + yPos);
 
     this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
-  }*/
+  }
 
   collisionHandler (bullet, zombie) {
     //wanneer een zombie sterft wordt ook de kogel vernietigt
@@ -100,7 +103,7 @@ export default class Play extends Phaser.State {
     zombie.destroy();
 
     //score gaat omhoog
-/*    this.score += 1;
-    this.scoreText.text = this.score.toString() + this.score;*/
+    this.score ++;
+    this.scoreText.text = this.score.toString();
   }
 }
