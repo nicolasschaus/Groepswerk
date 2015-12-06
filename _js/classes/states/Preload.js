@@ -19,6 +19,14 @@ export default class Preload extends Phaser.State {
     //small objects
     this.load.image('bullet', 'assets/bullet.png');
 
+    //audio
+    this.load.audio('menuMusic', 'assets/audio/menu-music.wav');
+    this.load.audio('wind', 'assets/audio/wind.wav');
+    this.load.audio('shoot', 'assets/audio/shoot.wav');
+    this.load.audio('spawnZombie', 'assets/audio/spawnZombie.wav');
+    this.load.audio('reload', 'assets/audio/reload.wav');
+    this.load.audio('death', 'assets/audio/death.wav');
+
     //font
     this.load.bitmapFont('gamefont', 'assets/fonts/gamefont/gamefont.png', 'assets/fonts/gamefont/gamefont.fnt');
   }

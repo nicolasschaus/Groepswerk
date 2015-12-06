@@ -15,6 +15,16 @@ export default class Play extends Phaser.State {
     //background weergeven
     this.background = this.game.add.sprite(0, 0, 'background');
 
+    //audio
+    this.backgroundSound = this.game.add.audio('wind');
+    this.backgroundSound.loop = true;
+    this.backgroundSound.volume = 0.8;
+    this.fireSound = this.game.add.audio('shoot');
+    this.spawnZombieSound = this.game.add.audio('spawnZombie');
+    this.dying = this.game.add.audio('death');
+
+    this.backgroundSound.play();
+
     //bullets
     this.bullets = this.game.add.group();
     this.bullets.enableBody = true;
@@ -27,7 +37,7 @@ export default class Play extends Phaser.State {
     this.zombies = this.game.add.group();
       this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
     this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
-    this.game.time.events.loop(Phaser.Timer.SECOND * 20, this.spawnSpecialZombie, this);
+    this.game.time.events.loop(Phaser.Timer.SECOND * 25, this.spawnSpecialZombie, this);
 
     //player weergeven
     this.soldier = new Soldier(this.game, this.game.width/2, this.game.height/2);
@@ -57,10 +67,11 @@ export default class Play extends Phaser.State {
   fire () {
     if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0)
     {
+        this.fireSound.play();
         this.nextFire = this.game.time.now + this.fireRate;
         let bullet = this.bullets.getFirstDead();
         bullet.reset(this.soldier.x - 8, this.soldier.y - 8);
-        this.game.physics.arcade.moveToPointer(bullet, 300);
+        this.game.physics.arcade.moveToPointer(bullet, 750);
     }
   }
 
@@ -83,6 +94,7 @@ export default class Play extends Phaser.State {
 
   //speciale zombies spawnen
   spawnSpecialZombie() {
+    this.spawnZombieSound.play();
     //console.log("spawned special at");
     let randomX = Math.random(0)*1050;
     let randomY = Math.random(0)*650;
@@ -109,19 +121,23 @@ export default class Play extends Phaser.State {
   }
 
   collisionHandlerDeath (soldier, zombie) {
+    this.dying.play();
     soldier.kill();
     zombie.kill();
-
 
     if(this.soldier.kill()) {
       //zombies stoppen met lopen wanneer speler dood is
       this.game.world.removeAll();
+      this.spawnZombieSound.destroy();
+      this.fireSound.destroy();
       this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+
+      console.log("score weergeven");
 
       //score weergeven
 /*      this.scoreTitle = this.game.add.bitmapText(this.game.width/2, this.game.height/2 - 50, 'gamefont', "CONGRATULATIONS !", 48);
       this.scoreTitle.anchor.setTo(0.5, 0.5);
-      this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont',"YOU SLAUGHTERED " + this.score.toString() + " ZOMBIES !", 24);
+      this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont', "YOU SLAUGHTERED " + this.score.toString() + " ZOMBIES !", 24);
       this.scoreText.anchor.setTo(0.5, 0.5);*/
     }
 
@@ -129,7 +145,7 @@ export default class Play extends Phaser.State {
   }
 
   endIt() {
-    console.log("done!");
-    this.game.state.start('End');
+    this.backgroundSound.destroy();
+    this.game.state.start('Scoreboard');
   }
 }

@@ -1,4 +1,4 @@
-import Soldier from '../objects/Soldier';
+import Soldier from './Soldier';
 
 export default class Zombie extends Phaser.Sprite {
   constructor(game, x, y, frame) {

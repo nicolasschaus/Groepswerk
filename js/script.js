@@ -60,10 +60,6 @@
 
 	var _classesStatesPlay2 = _interopRequireDefault(_classesStatesPlay);
 
-	var _classesStatesEnd = __webpack_require__(7);
-
-	var _classesStatesEnd2 = _interopRequireDefault(_classesStatesEnd);
-
 	var _classesStatesScoreboard = __webpack_require__(8);
 
 	var _classesStatesScoreboard2 = _interopRequireDefault(_classesStatesScoreboard);
@@ -75,7 +71,6 @@
 	  game.state.add('Preload', _classesStatesPreload2['default'], false);
 	  game.state.add('Menu', _classesStatesMenu2['default'], false);
 	  game.state.add('Play', _classesStatesPlay2['default'], false);
-	  game.state.add('End', _classesStatesEnd2['default'], false);
 	  game.state.add('Scoreboard', _classesStatesScoreboard2['default'], false);
 	  game.state.start('Preload');
 	};
@@ -131,6 +126,14 @@
 	      //small objects
 	      this.load.image('bullet', 'assets/bullet.png');
 
+	      //audio
+	      this.load.audio('menuMusic', 'assets/audio/menu-music.wav');
+	      this.load.audio('wind', 'assets/audio/wind.wav');
+	      this.load.audio('shoot', 'assets/audio/shoot.wav');
+	      this.load.audio('spawnZombie', 'assets/audio/spawnZombie.wav');
+	      this.load.audio('reload', 'assets/audio/reload.wav');
+	      this.load.audio('death', 'assets/audio/death.wav');
+
 	      //font
 	      this.load.bitmapFont('gamefont', 'assets/fonts/gamefont/gamefont.png', 'assets/fonts/gamefont/gamefont.fnt');
 	    }
@@ -178,6 +181,9 @@
 	    key: 'create',
 	    value: function create() {
 	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+	      this.backgroundMusic = this.game.add.audio('menuMusic');
+	      this.backgroundMusic.play();
+	      this.backgroundMusic.loop = true;
 
 	      this.titleGroup = this.game.add.group();
 	      this.title = this.game.add.image(this.game.width / 2, this.game.height / 2 - 210, 'title');
@@ -197,11 +203,13 @@
 	    key: 'startClick',
 	    value: function startClick() {
 	      this.game.state.start('Play');
+	      this.backgroundMusic.destroy();
 	    }
 	  }, {
 	    key: 'scoreClick',
 	    value: function scoreClick() {
 	      this.game.state.start('Scoreboard');
+	      this.backgroundMusic.destroy();
 	    }
 	  }]);
 
@@ -266,6 +274,16 @@
 	      //background weergeven
 	      this.background = this.game.add.sprite(0, 0, 'background');
 
+	      //audio
+	      this.backgroundSound = this.game.add.audio('wind');
+	      this.backgroundSound.loop = true;
+	      this.backgroundSound.volume = 0.8;
+	      this.fireSound = this.game.add.audio('shoot');
+	      this.spawnZombieSound = this.game.add.audio('spawnZombie');
+	      this.dying = this.game.add.audio('death');
+
+	      this.backgroundSound.play();
+
 	      //bullets
 	      this.bullets = this.game.add.group();
 	      this.bullets.enableBody = true;
@@ -278,7 +296,7 @@
 	      this.zombies = this.game.add.group();
 	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
 	      this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
-	      this.game.time.events.loop(Phaser.Timer.SECOND * 20, this.spawnSpecialZombie, this);
+	      this.game.time.events.loop(Phaser.Timer.SECOND * 25, this.spawnSpecialZombie, this);
 
 	      //player weergeven
 	      this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
@@ -308,10 +326,11 @@
 	    key: 'fire',
 	    value: function fire() {
 	      if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0) {
+	        this.fireSound.play();
 	        this.nextFire = this.game.time.now + this.fireRate;
 	        var bullet = this.bullets.getFirstDead();
 	        bullet.reset(this.soldier.x - 8, this.soldier.y - 8);
-	        this.game.physics.arcade.moveToPointer(bullet, 300);
+	        this.game.physics.arcade.moveToPointer(bullet, 750);
 	      }
 	    }
 
@@ -338,6 +357,7 @@
 	  }, {
 	    key: 'spawnSpecialZombie',
 	    value: function spawnSpecialZombie() {
+	      this.spawnZombieSound.play();
 	      //console.log("spawned special at");
 	      var randomX = Math.random(0) * 1050;
 	      var randomY = Math.random(0) * 650;
@@ -366,18 +386,23 @@
 	  }, {
 	    key: 'collisionHandlerDeath',
 	    value: function collisionHandlerDeath(soldier, zombie) {
+	      this.dying.play();
 	      soldier.kill();
 	      zombie.kill();
 
 	      if (this.soldier.kill()) {
 	        //zombies stoppen met lopen wanneer speler dood is
 	        this.game.world.removeAll();
+	        this.spawnZombieSound.destroy();
+	        this.fireSound.destroy();
 	        this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+
+	        console.log("score weergeven");
 
 	        //score weergeven
 	        /*      this.scoreTitle = this.game.add.bitmapText(this.game.width/2, this.game.height/2 - 50, 'gamefont', "CONGRATULATIONS !", 48);
 	              this.scoreTitle.anchor.setTo(0.5, 0.5);
-	              this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont',"YOU SLAUGHTERED " + this.score.toString() + " ZOMBIES !", 24);
+	              this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont', "YOU SLAUGHTERED " + this.score.toString() + " ZOMBIES !", 24);
 	              this.scoreText.anchor.setTo(0.5, 0.5);*/
 	      }
 
@@ -386,8 +411,8 @@
 	  }, {
 	    key: 'endIt',
 	    value: function endIt() {
-	      console.log("done!");
-	      this.game.state.start('End');
+	      this.backgroundSound.destroy();
+	      this.game.state.start('Scoreboard');
 	    }
 	  }]);
 
@@ -450,9 +475,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var _objectsSoldier = __webpack_require__(4);
+	var _Soldier = __webpack_require__(4);
 
-	var _objectsSoldier2 = _interopRequireDefault(_objectsSoldier);
+	var _Soldier2 = _interopRequireDefault(_Soldier);
 
 	var Zombie = (function (_Phaser$Sprite) {
 	  _inherits(Zombie, _Phaser$Sprite);
@@ -464,14 +489,14 @@
 	    this.anchor.setTo(0.5, 0.5);
 	    this.game.physics.arcade.enableBody(this);
 
-	    this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
+	    this.soldier = new _Soldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	  }
 
 	  _createClass(Zombie, [{
 	    key: 'update',
 	    value: function update() {
 	      this.rotation = this.game.physics.arcade.angleBetween(this, this.soldier);
-	      this.game.physics.arcade.moveToObject(this, this.soldier, 400);
+	      this.game.physics.arcade.moveToObject(this, this.soldier, 100);
 	    }
 	  }]);
 
@@ -501,9 +526,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var _objectsSoldier = __webpack_require__(4);
+	var _Soldier = __webpack_require__(4);
 
-	var _objectsSoldier2 = _interopRequireDefault(_objectsSoldier);
+	var _Soldier2 = _interopRequireDefault(_Soldier);
 
 	var Zombie = (function (_Phaser$Sprite) {
 	  _inherits(Zombie, _Phaser$Sprite);
@@ -515,7 +540,7 @@
 	    this.anchor.setTo(0.5, 0.5);
 	    this.game.physics.arcade.enableBody(this);
 
-	    this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
+	    this.soldier = new _Soldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	  }
 
 	  _createClass(Zombie, [{
@@ -533,72 +558,9 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var End = (function (_Phaser$State) {
-	  _inherits(End, _Phaser$State);
-
-	  function End() {
-	    _classCallCheck(this, End);
-
-	    _get(Object.getPrototypeOf(End.prototype), 'constructor', this).apply(this, arguments);
-	  }
-
-	  _createClass(End, [{
-	    key: 'create',
-	    value: function create() {
-	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
-
-	      this.titleGroup = this.game.add.group();
-	      this.title = this.game.add.image(this.game.width / 2, 0, 'title-mini');
-	      this.title.anchor.setTo(0.5, 0.5);
-	      this.titleGroup.add(this.title);
-	      this.titleGroup.y = 100;
-
-	      this.backButton = this.game.add.button(100, this.game.height - 70, 'backButton', this.backClick, this);
-	      this.backButton.anchor.setTo(0.5, 0.5);
-	      this.game.add.tween(this.backButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
-
-	      this.startButton = this.game.add.button(this.game.width - 100, this.game.height - 70, 'startButton', this.startClick, this);
-	      this.startButton.anchor.setTo(0.5, 0.5);
-	      this.game.add.tween(this.startButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
-	    }
-	  }, {
-	    key: 'startClick',
-	    value: function startClick() {
-	      this.game.state.start('Play');
-	    }
-	  }, {
-	    key: 'backClick',
-	    value: function backClick() {
-	      this.game.state.start('Menu');
-	    }
-	  }]);
-
-	  return End;
-	})(Phaser.State);
-
-	exports['default'] = End;
-	module.exports = exports['default'];
-
-/***/ },
+/* 7 */,
 /* 8 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -610,9 +572,15 @@
 
 	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _Menu = __webpack_require__(2);
+
+	var _Menu2 = _interopRequireDefault(_Menu);
 
 	var Scoreboard = (function (_Phaser$State) {
 	  _inherits(Scoreboard, _Phaser$State);
@@ -627,6 +595,9 @@
 	    key: 'create',
 	    value: function create() {
 	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+	      this.backgroundMusic = this.game.add.audio('menuMusic');
+	      this.backgroundMusic.play();
+	      this.backgroundMusic.loop = true;
 
 	      this.titleGroup = this.game.add.group();
 	      this.title = this.game.add.image(this.game.width / 2, 0, 'title-mini');
@@ -646,11 +617,13 @@
 	    key: 'startClick',
 	    value: function startClick() {
 	      this.game.state.start('Play');
+	      this.backgroundMusic.destroy();
 	    }
 	  }, {
 	    key: 'backClick',
 	    value: function backClick() {
 	      this.game.state.start('Menu');
+	      this.backgroundMusic.destroy();
 	    }
 	  }]);
 

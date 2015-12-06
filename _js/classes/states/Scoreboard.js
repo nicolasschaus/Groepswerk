@@ -1,6 +1,11 @@
+import Menu from './Menu';
+
 export default class Scoreboard extends Phaser.State {
   create() {
     this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+    this.backgroundMusic = this.game.add.audio('menuMusic');
+    this.backgroundMusic.play();
+    this.backgroundMusic.loop = true;
 
     this.titleGroup = this.game.add.group();
     this.title = this.game.add.image(this.game.width/2, 0,'title-mini');
@@ -19,9 +24,11 @@ export default class Scoreboard extends Phaser.State {
 
   startClick() {
     this.game.state.start('Play');
+    this.backgroundMusic.destroy();
   }
   
   backClick() {
     this.game.state.start('Menu');
+    this.backgroundMusic.destroy();
   }
 }
