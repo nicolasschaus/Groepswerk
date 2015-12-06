@@ -51,6 +51,7 @@ export default class Play extends Phaser.State {
 
     //collision detection
     this.game.physics.arcade.overlap(this.bullets, this.zombies, this.collisionHandler, null, this);
+    this.game.physics.arcade.overlap(this.soldier, this.zombies, this.collisionHandlerDeath, null, this);
   }
 
   fire () {
@@ -100,10 +101,18 @@ export default class Play extends Phaser.State {
   collisionHandler (bullet, zombie) {
     //wanneer een zombie sterft wordt ook de kogel vernietigt
     bullet.kill();
-    zombie.destroy();
+    zombie.kill();
 
     //score gaat omhoog
     this.score ++;
     this.scoreText.text = this.score.toString();
   }
+
+  collisionHandlerDeath (soldier, zombie) {
+    soldier.kill();
+    zombie.kill();
+
+    this.game.state.start('End');
+  }
+
 }

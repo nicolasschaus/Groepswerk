@@ -1,4 +1,4 @@
-export default class Scoreboard extends Phaser.State {
+export default class End extends Phaser.State {
   create() {
     this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
 

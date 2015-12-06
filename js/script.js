@@ -56,13 +56,17 @@
 
 	var _classesStatesMenu2 = _interopRequireDefault(_classesStatesMenu);
 
-	var _classesStatesScoreboard = __webpack_require__(3);
-
-	var _classesStatesScoreboard2 = _interopRequireDefault(_classesStatesScoreboard);
-
 	var _classesStatesPlay = __webpack_require__(4);
 
 	var _classesStatesPlay2 = _interopRequireDefault(_classesStatesPlay);
+
+	var _classesStatesEnd = __webpack_require__(9);
+
+	var _classesStatesEnd2 = _interopRequireDefault(_classesStatesEnd);
+
+	var _classesStatesScoreboard = __webpack_require__(3);
+
+	var _classesStatesScoreboard2 = _interopRequireDefault(_classesStatesScoreboard);
 
 	var game = undefined;
 
@@ -70,8 +74,9 @@
 	  game = new Phaser.Game(1050, 650, Phaser.AUTO);
 	  game.state.add('Preload', _classesStatesPreload2['default'], false);
 	  game.state.add('Menu', _classesStatesMenu2['default'], false);
-	  game.state.add('Scoreboard', _classesStatesScoreboard2['default'], false);
 	  game.state.add('Play', _classesStatesPlay2['default'], false);
+	  game.state.add('End', _classesStatesEnd2['default'], false);
+	  game.state.add('Scoreboard', _classesStatesScoreboard2['default'], false);
 	  game.state.start('Preload');
 	};
 
@@ -132,7 +137,7 @@
 	  }, {
 	    key: 'onLoadComplete',
 	    value: function onLoadComplete() {
-	      this.game.state.start('Play');
+	      this.game.state.start('Menu');
 	    }
 	  }]);
 
@@ -236,7 +241,7 @@
 	  _createClass(Scoreboard, [{
 	    key: 'create',
 	    value: function create() {
-	      this.background = this.game.add.sprite(0, 0, 'background');
+	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
 
 	      this.titleGroup = this.game.add.group();
 	      this.title = this.game.add.image(this.game.width / 2, 0, 'title-mini');
@@ -361,6 +366,7 @@
 
 	      //collision detection
 	      this.game.physics.arcade.overlap(this.bullets, this.zombies, this.collisionHandler, null, this);
+	      this.game.physics.arcade.overlap(this.soldier, this.zombies, this.collisionHandlerDeath, null, this);
 	    }
 	  }, {
 	    key: 'fire',
@@ -415,11 +421,19 @@
 	    value: function collisionHandler(bullet, zombie) {
 	      //wanneer een zombie sterft wordt ook de kogel vernietigt
 	      bullet.kill();
-	      zombie.destroy();
+	      zombie.kill();
 
 	      //score gaat omhoog
 	      this.score++;
 	      this.scoreText.text = this.score.toString();
+	    }
+	  }, {
+	    key: 'collisionHandlerDeath',
+	    value: function collisionHandlerDeath(soldier, zombie) {
+	      soldier.kill();
+	      zombie.kill();
+
+	      this.game.state.start('End');
 	    }
 	  }]);
 
@@ -562,6 +576,71 @@
 	})(Phaser.Sprite);
 
 	exports['default'] = Zombie;
+	module.exports = exports['default'];
+
+/***/ },
+/* 8 */,
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var End = (function (_Phaser$State) {
+	  _inherits(End, _Phaser$State);
+
+	  function End() {
+	    _classCallCheck(this, End);
+
+	    _get(Object.getPrototypeOf(End.prototype), 'constructor', this).apply(this, arguments);
+	  }
+
+	  _createClass(End, [{
+	    key: 'create',
+	    value: function create() {
+	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+
+	      this.titleGroup = this.game.add.group();
+	      this.title = this.game.add.image(this.game.width / 2, 0, 'title-mini');
+	      this.title.anchor.setTo(0.5, 0.5);
+	      this.titleGroup.add(this.title);
+	      this.titleGroup.y = 100;
+
+	      this.backButton = this.game.add.button(100, this.game.height - 70, 'backButton', this.backClick, this);
+	      this.backButton.anchor.setTo(0.5, 0.5);
+	      this.game.add.tween(this.backButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+
+	      this.startButton = this.game.add.button(this.game.width - 100, this.game.height - 70, 'startButton', this.startClick, this);
+	      this.startButton.anchor.setTo(0.5, 0.5);
+	      this.game.add.tween(this.startButton).to({ y: this.game.height - 65 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+	    }
+	  }, {
+	    key: 'startClick',
+	    value: function startClick() {
+	      this.game.state.start('Play');
+	    }
+	  }, {
+	    key: 'backClick',
+	    value: function backClick() {
+	      this.game.state.start('Menu');
+	    }
+	  }]);
+
+	  return End;
+	})(Phaser.State);
+
+	exports['default'] = End;
 	module.exports = exports['default'];
 
 /***/ }
