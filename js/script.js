@@ -60,7 +60,7 @@
 
 	var _classesStatesPlay2 = _interopRequireDefault(_classesStatesPlay);
 
-	var _classesStatesScoreboard = __webpack_require__(8);
+	var _classesStatesScoreboard = __webpack_require__(7);
 
 	var _classesStatesScoreboard2 = _interopRequireDefault(_classesStatesScoreboard);
 
@@ -558,8 +558,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 7 */,
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
