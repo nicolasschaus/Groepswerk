@@ -39,11 +39,17 @@ export default class Play extends Phaser.State {
 
     //zombies weergeven
     this.zombies = this.game.add.group();
+<<<<<<< HEAD
       this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
       this.zombie.animations.add('run');
       this.zombie.animations.play('run', 10, true);
       this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
       this.game.time.events.loop(Phaser.Timer.SECOND * 25, this.spawnSpecialZombie, this);
+=======
+    this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
+    this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
+    this.game.time.events.loop(Phaser.Timer.SECOND * 25, this.spawnSpecialZombie, this);
+>>>>>>> 54668987bdc9b48d3733de0827c5a2cc764f5b6d
 
     //player weergeven
     this.soldier = new Soldier(this.game, this.game.width/2, this.game.height/2);
