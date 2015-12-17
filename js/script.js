@@ -60,14 +60,16 @@
 
 	var _classesStatesPlay2 = _interopRequireDefault(_classesStatesPlay);
 
-	var _classesStatesScoreboard = __webpack_require__(8);
+	var _classesStatesScoreboard = __webpack_require__(7);
 
 	var _classesStatesScoreboard2 = _interopRequireDefault(_classesStatesScoreboard);
 
 	var game = undefined;
+	var width = window.innerWidth;
+	var height = window.innerHeight;
 
 	var init = function init() {
-	  game = new Phaser.Game(1050, 650, Phaser.AUTO);
+	  game = new Phaser.Game(width, height, Phaser.AUTO);
 	  game.state.add('Preload', _classesStatesPreload2['default'], false);
 	  game.state.add('Menu', _classesStatesMenu2['default'], false);
 	  game.state.add('Play', _classesStatesPlay2['default'], false);
@@ -110,8 +112,9 @@
 	      this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
 
 	      //alles rond background and menu's
-	      this.load.image('background', 'assets/background.png');
-	      this.load.image('backgroundMenu', 'assets/backgroundMenu.png');
+	      this.load.image('background', 'assets/background.jpg');
+	      this.load.image('fog', 'assets/fog.png');
+	      this.load.image('car', 'assets/car.png');
 	      this.load.image('title', 'assets/title.png');
 	      this.load.image('title-mini', 'assets/title-mini.png');
 	      this.load.image('startButton', 'assets/start-button.png');
@@ -120,11 +123,14 @@
 
 	      //player en enemies objecten
 	      this.load.image('soldier', 'assets/soldier.png');
-	      this.load.spritesheet('zombie', 'assets/zombie.png', 61, 75, 1);
-	      this.load.spritesheet('zombieSpecial', 'assets/zombieSpecial.png', 61, 75, 1);
+	      this.load.image('zombie', 'assets/zombie.png', 61, 75, 1);
+	      this.load.image('zombieSpecial', 'assets/zombieSpecial.png', 61, 75, 1);
 
 	      //small objects
 	      this.load.image('bullet', 'assets/bullet.png');
+	      this.load.image('skull', 'assets/skull.png');
+	      this.load.image('gun', 'assets/gun.png');
+	      this.load.image('bar', 'assets/bar.png');
 
 	      //audio
 	      this.load.audio('menuMusic', 'assets/audio/menu-music.wav');
@@ -140,7 +146,7 @@
 	  }, {
 	    key: 'onLoadComplete',
 	    value: function onLoadComplete() {
-	      this.game.state.start('Menu');
+	      this.game.state.start('Play');
 	    }
 	  }]);
 
@@ -272,7 +278,10 @@
 	      this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	      //background weergeven
-	      this.background = this.game.add.sprite(0, 0, 'background');
+	      this.background = this.game.add.sprite(this.game.width / 2, this.game.height / 2, 'fog');
+	      this.background.anchor.setTo(0.5, 0.5);
+	      this.car = this.game.add.sprite(this.game.width / 2, this.game.height / 2, 'car');
+	      this.car.anchor.setTo(0.5, 0.5);
 
 	      //audio
 	      this.backgroundSound = this.game.add.audio('wind');
@@ -291,10 +300,13 @@
 	      this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
 	      this.bullets.setAll('checkWorldBounds', true);
 	      this.bullets.setAll('outOfBoundsKill', true);
+	      this.overheated = false;
 
 	      //zombies weergeven
 	      this.zombies = this.game.add.group();
 	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
+	      this.zombie.animations.add('run');
+	      this.zombie.animations.play('run', 10, true);
 	      this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
 	      this.game.time.events.loop(Phaser.Timer.SECOND * 25, this.spawnSpecialZombie, this);
 
@@ -303,19 +315,36 @@
 	      this.game.add.existing(this.soldier);
 
 	      //score weergeven
-	      this.scoreTekstje = this.game.add.bitmapText(this.game.width / 2 - 100, 25, 'gamefont', "ZOMBIES SLAUGHTERED x", 16);
-	      this.scoreText = this.game.add.bitmapText(this.game.width / 2 + 100, 20, 'gamefont', this.score.toString(), 24);
+	      this.skull = this.game.add.sprite(50, this.game.height - 50, 'skull');
+	      this.skull.anchor.setTo(0.5, 0.5);
+	      this.tekst = this.game.add.bitmapText(75, this.game.height - 42, 'gamefont', "x", 18);
+	      this.scoreText = this.game.add.bitmapText(92, this.game.height - 50, 'gamefont', this.score.toString(), 28);
+
+	      /*    this.gun = this.game.add.sprite(100, this.game.height - 50, 'gun');
+	          this.gun.anchor.setTo(0.5, 0.5);
+	          this.bar = this.game.add.sprite(50, this.game.height - 125, 'bar');
+	          this.bar.anchor.setTo(0.5, 0.5);
+	          this.cropCounter = 100;*/
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
 	      this.soldier.rotation = this.game.physics.arcade.angleToPointer(this.soldier);
 
+	      /*    this.cropCounter -= 0.2;
+	      
+	          if(this.cropCounter <= 100) {
+	            this.cropCounter = 100;
+	          }
+	      
+	          this.cropRect = new Phaser.Rectangle(50, this.cropCounter, 0, this.bar.height);
+	          this.bar.crop(this.cropRect);
+	      
+	          console.log(this.cropCounter);
+	          this.bar.updateCrop();*/
+
 	      if (this.game.input.activePointer.isDown) {
-	        //als je 5 seconden lang schiet, raakt je wapen oververhit
-	        if (this.game.input.activePointer.duration <= 5000) {
-	          this.fire();
-	        }
+	        this.fire();
 	      }
 
 	      //collision detection
@@ -331,6 +360,7 @@
 	        var bullet = this.bullets.getFirstDead();
 	        bullet.reset(this.soldier.x - 8, this.soldier.y - 8);
 	        this.game.physics.arcade.moveToPointer(bullet, 750);
+	        //this.cropCounter += 5;
 	      }
 	    }
 
@@ -338,17 +368,26 @@
 	  }, {
 	    key: 'spawnZombie',
 	    value: function spawnZombie() {
-	      //console.log("spawned at");
-	      var randomX = Math.random(0) * 1050;
-	      var randomY = Math.random(0) * 650;
+	      var randomX = Math.random(-300) * 2000;
+	      var randomY = Math.random(-300) * 1000;
 
-	      var xPos = randomX + 1050 - this.zombie.width;
-	      var yPos = randomY + 650 - this.zombie.height;
+	      if (randomX >= 0 && randomX < 750) {
+	        randomX -= this.game.width / 2;
+	      } else if (randomX >= 750 && randomX <= 1500) {
+	        randomX += this.game.width / 2;
+	      }
+
+	      if (randomY >= 0 && randomY < 400) {
+	        randomY -= this.game.height / 2;
+	      } else if (randomY >= 400 && randomY <= 800) {
+	        randomY += this.game.height / 2;
+	      }
+
+	      var xPos = randomX;
+	      var yPos = randomY;
 
 	      var zombie = new _objectsZombie2['default'](this.game, xPos, yPos);
 	      this.zombies.add(zombie);
-
-	      //console.log(xPos + ", " + yPos);
 
 	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
 	    }
@@ -358,17 +397,26 @@
 	    key: 'spawnSpecialZombie',
 	    value: function spawnSpecialZombie() {
 	      this.spawnZombieSound.play();
-	      //console.log("spawned special at");
-	      var randomX = Math.random(0) * 1050;
-	      var randomY = Math.random(0) * 650;
+	      var randomX = Math.random(-300) * 2000;
+	      var randomY = Math.random(-300) * 1000;
 
-	      var xPos = randomX - 1050 - this.zombie.width;
-	      var yPos = randomY - 650 - this.zombie.height;
+	      if (randomX >= 0 && randomX < 750) {
+	        randomX -= this.game.width / 2;
+	      } else if (randomX >= 750 && randomX <= 1500) {
+	        randomX += this.game.width / 2;
+	      }
+
+	      if (randomY >= 0 && randomY < 400) {
+	        randomY -= this.game.height / 2;
+	      } else if (randomY >= 400 && randomY <= 800) {
+	        randomY += this.game.height / 2;
+	      }
+
+	      var xPos = randomX;
+	      var yPos = randomY;
 
 	      var zombie = new _objectsSpecialZombie2['default'](this.game, xPos, yPos);
 	      this.zombies.add(zombie);
-
-	      //console.log(xPos + ", " + yPos);
 
 	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
 	    }
@@ -400,13 +448,9 @@
 	        console.log("score weergeven");
 
 	        //score weergeven
-	        /*      this.scoreTitle = this.game.add.bitmapText(this.game.width/2, this.game.height/2 - 50, 'gamefont', "CONGRATULATIONS !", 48);
-	              this.scoreTitle.anchor.setTo(0.5, 0.5);
-	              this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont', "YOU SLAUGHTERED " + this.score.toString() + " ZOMBIES !", 24);
-	              this.scoreText.anchor.setTo(0.5, 0.5);*/
 	      }
 
-	      this.game.time.events.loop(Phaser.Timer.SECOND * 10, this.endIt, this);
+	      this.timer = this.game.time.events.loop(Phaser.Timer.SECOND * 15, this.endIt, this);
 	    }
 	  }, {
 	    key: 'endIt',
@@ -558,8 +602,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 7 */,
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

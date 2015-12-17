@@ -3,8 +3,9 @@ export default class Preload extends Phaser.State {
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
 
     //alles rond background and menu's
-    this.load.image('background', 'assets/background.png');
-    this.load.image('backgroundMenu', 'assets/backgroundMenu.png');
+    this.load.image('background', 'assets/background.jpg');
+    this.load.image('fog', 'assets/fog.png');
+    this.load.image('car', 'assets/car.png');
     this.load.image('title', 'assets/title.png');
     this.load.image('title-mini', 'assets/title-mini.png');
     this.load.image('startButton', 'assets/start-button.png');
@@ -13,11 +14,14 @@ export default class Preload extends Phaser.State {
 
     //player en enemies objecten
     this.load.image('soldier', 'assets/soldier.png');
-    this.load.spritesheet('zombie', 'assets/zombie.png', 61, 75, 1);
-    this.load.spritesheet('zombieSpecial', 'assets/zombieSpecial.png', 61, 75, 1);
+    this.load.image('zombie', 'assets/zombie.png', 61, 75, 1);
+    this.load.image('zombieSpecial', 'assets/zombieSpecial.png', 61, 75, 1);
 
     //small objects
     this.load.image('bullet', 'assets/bullet.png');
+    this.load.image('skull', 'assets/skull.png');
+    this.load.image('gun', 'assets/gun.png');
+    this.load.image('bar', 'assets/bar.png');
 
     //audio
     this.load.audio('menuMusic', 'assets/audio/menu-music.wav');
@@ -32,6 +36,6 @@ export default class Preload extends Phaser.State {
   }
 
   onLoadComplete() {
-    this.game.state.start('Menu');
+    this.game.state.start('Play');
   }
 }
