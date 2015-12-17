@@ -39,6 +39,9 @@ export default class Play extends Phaser.State {
     this.bullets.setAll('outOfBoundsKill', true);
     this.overheated = false;
 
+    //bloodstain
+    this.bloodstains = this.game.add.group();
+
     //zombies weergeven
     this.zombies = this.game.add.group();
       this.zombie = new Zombie(this.game, this.game.world.randomX, this.game.world.randomX);
@@ -72,17 +75,19 @@ export default class Play extends Phaser.State {
     //wanneer een zombie sterft wordt ook de kogel vernietigt
     bullet.kill();
     zombie.kill();
-/*    this.blood = this.game.add.sprite(zombie.x, zombie.y, 'blood');
-    this.blood.anchor.setTo(0.5, 0.5);
-    this.game.time.events.add(Phaser.Timer.SECOND, this.fade, this);*/
+    let blood = this.game.add.sprite(zombie.x, zombie.y, 'blood');
+    blood.anchor.setTo(0.5, 0.5);
+    this.bloodstains.add(blood);
+    this.game.time.events.add(Phaser.Timer.SECOND, this.fade, this, blood);
 
     //score gaat omhoog
     this.score ++;
     this.scoreText.text = this.score.toString();
   }
 
-  fade() {
-    this.game.add.tween(this.blood).to( { alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+  fade(blood) {
+    //console.log(blood);
+    this.game.add.tween(blood).to( { alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
   }
 
   collisionHandlerDeath (soldier, zombie) {
