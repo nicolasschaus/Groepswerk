@@ -14,21 +14,19 @@ export default class Preload extends Phaser.State {
 
     //player en enemies objecten
     this.load.image('soldier', 'assets/soldier.png');
-    this.load.image('zombie', 'assets/zombie.png', 61, 75, 1);
-    this.load.image('zombieSpecial', 'assets/zombieSpecial.png', 61, 75, 1);
+    this.load.image('zombie', 'assets/zombie.png');
+    this.load.image('zombieSpecial', 'assets/zombieSpecial.png');
 
     //small objects
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('skull', 'assets/skull.png');
-    this.load.image('gun', 'assets/gun.png');
-    this.load.image('bar', 'assets/bar.png');
+    this.load.image('blood', 'assets/blood.png');
 
     //audio
     this.load.audio('menuMusic', 'assets/audio/menu-music.wav');
     this.load.audio('wind', 'assets/audio/wind.wav');
     this.load.audio('shoot', 'assets/audio/shoot.wav');
     this.load.audio('spawnZombie', 'assets/audio/spawnZombie.wav');
-    this.load.audio('reload', 'assets/audio/reload.wav');
     this.load.audio('death', 'assets/audio/death.wav');
 
     //font
@@ -36,6 +34,6 @@ export default class Preload extends Phaser.State {
   }
 
   onLoadComplete() {
-    this.game.state.start('Play');
+    this.game.state.start('Menu');
   }
 }

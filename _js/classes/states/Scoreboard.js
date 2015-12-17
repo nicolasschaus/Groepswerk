@@ -2,7 +2,7 @@ import Menu from './Menu';
 
 export default class Scoreboard extends Phaser.State {
   create() {
-    this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+    this.background = this.game.add.sprite(0, 0, 'background');
     this.backgroundMusic = this.game.add.audio('menuMusic');
     this.backgroundMusic.play();
     this.backgroundMusic.loop = true;

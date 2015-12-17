@@ -123,21 +123,19 @@
 
 	      //player en enemies objecten
 	      this.load.image('soldier', 'assets/soldier.png');
-	      this.load.image('zombie', 'assets/zombie.png', 61, 75, 1);
-	      this.load.image('zombieSpecial', 'assets/zombieSpecial.png', 61, 75, 1);
+	      this.load.image('zombie', 'assets/zombie.png');
+	      this.load.image('zombieSpecial', 'assets/zombieSpecial.png');
 
 	      //small objects
 	      this.load.image('bullet', 'assets/bullet.png');
 	      this.load.image('skull', 'assets/skull.png');
-	      this.load.image('gun', 'assets/gun.png');
-	      this.load.image('bar', 'assets/bar.png');
+	      this.load.image('blood', 'assets/blood.png');
 
 	      //audio
 	      this.load.audio('menuMusic', 'assets/audio/menu-music.wav');
 	      this.load.audio('wind', 'assets/audio/wind.wav');
 	      this.load.audio('shoot', 'assets/audio/shoot.wav');
 	      this.load.audio('spawnZombie', 'assets/audio/spawnZombie.wav');
-	      this.load.audio('reload', 'assets/audio/reload.wav');
 	      this.load.audio('death', 'assets/audio/death.wav');
 
 	      //font
@@ -146,7 +144,7 @@
 	  }, {
 	    key: 'onLoadComplete',
 	    value: function onLoadComplete() {
-	      this.game.state.start('Play');
+	      this.game.state.start('Menu');
 	    }
 	  }]);
 
@@ -186,7 +184,7 @@
 	  _createClass(Menu, [{
 	    key: 'create',
 	    value: function create() {
-	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+	      this.background = this.game.add.sprite(0, 0, 'background');
 	      this.backgroundMusic = this.game.add.audio('menuMusic');
 	      this.backgroundMusic.play();
 	      this.backgroundMusic.loop = true;
@@ -197,13 +195,13 @@
 	      this.titleGroup.y = 100;
 	      this.title.anchor.setTo(0.5, 0.5);
 
-	      this.startButton = this.game.add.button(this.game.width / 2 - 200, 500, 'startButton', this.startClick, this);
+	      this.startButton = this.game.add.button(this.game.width / 2 - 200, this.game.height / 2 + 200, 'startButton', this.startClick, this);
 	      this.startButton.anchor.setTo(0.5, 0.5);
-	      this.game.add.tween(this.startButton).to({ y: 505 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+	      this.game.add.tween(this.startButton).to({ y: 550 }, 725, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
 
-	      this.scoreButton = this.game.add.button(this.game.width / 2 + 125, 500, 'scoreButton', this.scoreClick, this);
+	      this.scoreButton = this.game.add.button(this.game.width / 2 + 125, this.game.height / 2 + 200, 'scoreButton', this.scoreClick, this);
 	      this.scoreButton.anchor.setTo(0.5, 0.5);
-	      this.game.add.tween(this.scoreButton).to({ y: 505 }, 750, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
+	      this.game.add.tween(this.scoreButton).to({ y: 550 }, 725, Phaser.Easing.Linear.NONE, true, 0, 1000, true);
 	    }
 	  }, {
 	    key: 'startClick',
@@ -274,13 +272,15 @@
 	      this.bullets;
 	      this.fireRate = 100;
 	      this.nextFire = 0;
+	      this.speed = 100;
+	      this.speedSpecial = 150;
 
 	      this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	      //background weergeven
-	      this.background = this.game.add.sprite(this.game.width / 2, this.game.height / 2, 'fog');
+	      this.background = this.game.add.image(this.game.width / 2, this.game.height / 2, 'fog');
 	      this.background.anchor.setTo(0.5, 0.5);
-	      this.car = this.game.add.sprite(this.game.width / 2, this.game.height / 2, 'car');
+	      this.car = this.game.add.image(this.game.width / 2, this.game.height / 2, 'car');
 	      this.car.anchor.setTo(0.5, 0.5);
 
 	      //audio
@@ -305,10 +305,8 @@
 	      //zombies weergeven
 	      this.zombies = this.game.add.group();
 	      this.zombie = new _objectsZombie2['default'](this.game, this.game.world.randomX, this.game.world.randomX);
-	      this.zombie.animations.add('run');
-	      this.zombie.animations.play('run', 10, true);
-	      this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.spawnZombie, this);
-	      this.game.time.events.loop(Phaser.Timer.SECOND * 25, this.spawnSpecialZombie, this);
+	      this.game.time.events.loop(Phaser.Timer.SECOND, this.spawnZombie, this);
+	      this.game.time.events.loop(Phaser.Timer.SECOND * 20, this.spawnSpecialZombie, this);
 
 	      //player weergeven
 	      this.soldier = new _objectsSoldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
@@ -319,29 +317,11 @@
 	      this.skull.anchor.setTo(0.5, 0.5);
 	      this.tekst = this.game.add.bitmapText(75, this.game.height - 42, 'gamefont', "x", 18);
 	      this.scoreText = this.game.add.bitmapText(92, this.game.height - 50, 'gamefont', this.score.toString(), 28);
-
-	      /*    this.gun = this.game.add.sprite(100, this.game.height - 50, 'gun');
-	          this.gun.anchor.setTo(0.5, 0.5);
-	          this.bar = this.game.add.sprite(50, this.game.height - 125, 'bar');
-	          this.bar.anchor.setTo(0.5, 0.5);
-	          this.cropCounter = 100;*/
 	    }
 	  }, {
 	    key: 'update',
 	    value: function update() {
 	      this.soldier.rotation = this.game.physics.arcade.angleToPointer(this.soldier);
-
-	      /*    this.cropCounter -= 0.2;
-	      
-	          if(this.cropCounter <= 100) {
-	            this.cropCounter = 100;
-	          }
-	      
-	          this.cropRect = new Phaser.Rectangle(50, this.cropCounter, 0, this.bar.height);
-	          this.bar.crop(this.cropRect);
-	      
-	          console.log(this.cropCounter);
-	          this.bar.updateCrop();*/
 
 	      if (this.game.input.activePointer.isDown) {
 	        this.fire();
@@ -352,84 +332,23 @@
 	      this.game.physics.arcade.overlap(this.soldier, this.zombies, this.collisionHandlerDeath, null, this);
 	    }
 	  }, {
-	    key: 'fire',
-	    value: function fire() {
-	      if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0) {
-	        this.fireSound.play();
-	        this.nextFire = this.game.time.now + this.fireRate;
-	        var bullet = this.bullets.getFirstDead();
-	        bullet.reset(this.soldier.x - 8, this.soldier.y - 8);
-	        this.game.physics.arcade.moveToPointer(bullet, 750);
-	        //this.cropCounter += 5;
-	      }
-	    }
-
-	    //zombies spawnen
-	  }, {
-	    key: 'spawnZombie',
-	    value: function spawnZombie() {
-	      var randomX = Math.random(-300) * 2000;
-	      var randomY = Math.random(-300) * 1000;
-
-	      if (randomX >= 0 && randomX < 750) {
-	        randomX -= this.game.width / 2;
-	      } else if (randomX >= 750 && randomX <= 1500) {
-	        randomX += this.game.width / 2;
-	      }
-
-	      if (randomY >= 0 && randomY < 400) {
-	        randomY -= this.game.height / 2;
-	      } else if (randomY >= 400 && randomY <= 800) {
-	        randomY += this.game.height / 2;
-	      }
-
-	      var xPos = randomX;
-	      var yPos = randomY;
-
-	      var zombie = new _objectsZombie2['default'](this.game, xPos, yPos);
-	      this.zombies.add(zombie);
-
-	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
-	    }
-
-	    //speciale zombies spawnen
-	  }, {
-	    key: 'spawnSpecialZombie',
-	    value: function spawnSpecialZombie() {
-	      this.spawnZombieSound.play();
-	      var randomX = Math.random(-300) * 2000;
-	      var randomY = Math.random(-300) * 1000;
-
-	      if (randomX >= 0 && randomX < 750) {
-	        randomX -= this.game.width / 2;
-	      } else if (randomX >= 750 && randomX <= 1500) {
-	        randomX += this.game.width / 2;
-	      }
-
-	      if (randomY >= 0 && randomY < 400) {
-	        randomY -= this.game.height / 2;
-	      } else if (randomY >= 400 && randomY <= 800) {
-	        randomY += this.game.height / 2;
-	      }
-
-	      var xPos = randomX;
-	      var yPos = randomY;
-
-	      var zombie = new _objectsSpecialZombie2['default'](this.game, xPos, yPos);
-	      this.zombies.add(zombie);
-
-	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
-	    }
-	  }, {
 	    key: 'collisionHandler',
 	    value: function collisionHandler(bullet, zombie) {
 	      //wanneer een zombie sterft wordt ook de kogel vernietigt
 	      bullet.kill();
 	      zombie.kill();
+	      /*    this.blood = this.game.add.sprite(zombie.x, zombie.y, 'blood');
+	          this.blood.anchor.setTo(0.5, 0.5);
+	          this.game.time.events.add(Phaser.Timer.SECOND, this.fade, this);*/
 
 	      //score gaat omhoog
 	      this.score++;
 	      this.scoreText.text = this.score.toString();
+	    }
+	  }, {
+	    key: 'fade',
+	    value: function fade() {
+	      this.game.add.tween(this.blood).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
 	    }
 	  }, {
 	    key: 'collisionHandlerDeath',
@@ -443,14 +362,93 @@
 	        this.game.world.removeAll();
 	        this.spawnZombieSound.destroy();
 	        this.fireSound.destroy();
-	        this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+	        this.background = this.game.add.image(this.game.width / 2, this.game.height / 2, 'fog');
+	        this.background.anchor.setTo(0.5, 0.5);
 
 	        console.log("score weergeven");
 
 	        //score weergeven
+	        /*      this.endText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'gamefont', "CONGRATULATIONS!", 32);
+	              this.endText.anchor.setTo(0.5, 0.5);
+	        
+	              this.endText2 = this.game.add.bitmapText(this.game.width/2, this.game.height/2 + 50, 'gamefont', "You have slain " + this.score.toString() + " zombies!", 32);
+	              this.endText2.anchor.setTo(0.5, 0.5);*/
 	      }
 
-	      this.timer = this.game.time.events.loop(Phaser.Timer.SECOND * 15, this.endIt, this);
+	      this.timer = this.game.time.events.loop(Phaser.Timer.SECOND, this.endIt, this);
+	    }
+	  }, {
+	    key: 'fire',
+	    value: function fire() {
+	      if (this.game.time.now > this.nextFire && this.bullets.countDead() > 0) {
+	        this.fireSound.play();
+	        this.nextFire = this.game.time.now + this.fireRate;
+	        var bullet = this.bullets.getFirstDead();
+	        bullet.reset(this.soldier.x - 8, this.soldier.y - 8);
+	        this.game.physics.arcade.moveToPointer(bullet, 750);
+	      }
+	    }
+
+	    //zombies spawnen
+	  }, {
+	    key: 'spawnZombie',
+	    value: function spawnZombie() {
+	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
+
+	      var randomX = Math.random(-300) * 2000;
+	      var randomY = Math.random(-300) * 1000;
+
+	      if (randomX >= 0 && randomX < 750) {
+	        randomX -= this.game.width / 2;
+	      } else if (randomX >= 750 && randomX <= 1500) {
+	        randomX += this.game.width / 2;
+	      }
+
+	      if (randomY >= 0 && randomY < 400) {
+	        randomY -= this.game.height / 2;
+	      } else if (randomY >= 400 && randomY <= 800) {
+	        randomY += this.game.height / 2;
+	      }
+
+	      var xPos = randomX;
+	      var yPos = randomY;
+
+	      var zombie = new _objectsZombie2['default'](this.game, xPos, yPos, this.speed);
+	      this.zombies.add(zombie);
+
+	      this.speed += 2;
+	    }
+
+	    //speciale zombies spawnen
+	  }, {
+	    key: 'spawnSpecialZombie',
+	    value: function spawnSpecialZombie() {
+	      this.game.physics.enable(this.zombie, Phaser.Physics.ARCADE);
+
+	      this.spawnZombieSound.play();
+
+	      var randomX = Math.random(-300) * 2000;
+	      var randomY = Math.random(-300) * 1000;
+
+	      if (randomX >= 0 && randomX < 750) {
+	        randomX -= this.game.width / 2;
+	      } else if (randomX >= 750 && randomX <= 1500) {
+	        randomX += this.game.width / 2;
+	      }
+
+	      if (randomY >= 0 && randomY < 400) {
+	        randomY -= this.game.height / 2;
+	      } else if (randomY >= 400 && randomY <= 800) {
+	        randomY += this.game.height / 2;
+	      }
+
+	      var xPos = randomX;
+	      var yPos = randomY;
+
+	      var zombie = new _objectsSpecialZombie2['default'](this.game, xPos, yPos, this.speedSpecial);
+	      this.zombies.add(zombie);
+
+	      this.speedSpecial += 2;
 	    }
 	  }, {
 	    key: 'endIt',
@@ -526,12 +524,14 @@
 	var Zombie = (function (_Phaser$Sprite) {
 	  _inherits(Zombie, _Phaser$Sprite);
 
-	  function Zombie(game, x, y, frame) {
+	  function Zombie(game, x, y, speed) {
 	    _classCallCheck(this, Zombie);
 
-	    _get(Object.getPrototypeOf(Zombie.prototype), 'constructor', this).call(this, game, x, y, 'zombie', frame);
+	    _get(Object.getPrototypeOf(Zombie.prototype), 'constructor', this).call(this, game, x, y, 'zombie', speed);
 	    this.anchor.setTo(0.5, 0.5);
 	    this.game.physics.arcade.enableBody(this);
+
+	    this.speed = speed;
 
 	    this.soldier = new _Soldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	  }
@@ -540,7 +540,7 @@
 	    key: 'update',
 	    value: function update() {
 	      this.rotation = this.game.physics.arcade.angleBetween(this, this.soldier);
-	      this.game.physics.arcade.moveToObject(this, this.soldier, 100);
+	      this.game.physics.arcade.moveToObject(this, this.soldier, this.speed);
 	    }
 	  }]);
 
@@ -577,12 +577,14 @@
 	var Zombie = (function (_Phaser$Sprite) {
 	  _inherits(Zombie, _Phaser$Sprite);
 
-	  function Zombie(game, x, y, frame) {
+	  function Zombie(game, x, y, speed) {
 	    _classCallCheck(this, Zombie);
 
-	    _get(Object.getPrototypeOf(Zombie.prototype), 'constructor', this).call(this, game, x, y, 'zombieSpecial', frame);
+	    _get(Object.getPrototypeOf(Zombie.prototype), 'constructor', this).call(this, game, x, y, 'zombieSpecial', speed);
 	    this.anchor.setTo(0.5, 0.5);
 	    this.game.physics.arcade.enableBody(this);
+
+	    this.speed = speed;
 
 	    this.soldier = new _Soldier2['default'](this.game, this.game.width / 2, this.game.height / 2);
 	  }
@@ -591,7 +593,7 @@
 	    key: 'update',
 	    value: function update() {
 	      this.rotation = this.game.physics.arcade.angleBetween(this, this.soldier);
-	      this.game.physics.arcade.moveToObject(this, this.soldier, 111);
+	      this.game.physics.arcade.moveToObject(this, this.soldier, this.speed);
 	    }
 	  }]);
 
@@ -637,7 +639,7 @@
 	  _createClass(Scoreboard, [{
 	    key: 'create',
 	    value: function create() {
-	      this.background = this.game.add.sprite(0, 0, 'backgroundMenu');
+	      this.background = this.game.add.sprite(0, 0, 'background');
 	      this.backgroundMusic = this.game.add.audio('menuMusic');
 	      this.backgroundMusic.play();
 	      this.backgroundMusic.loop = true;
